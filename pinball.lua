@@ -7,9 +7,9 @@ category_all = category_world
 
 -- Position of camera
 camera_x = 0
-camera_y = 17--15--170
-camera_z = 150--200--200
-camera_turn_x = -10---45---2---45
+camera_y = 170--15--170
+camera_z = 200--200--200
+camera_turn_x = -45---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
 
@@ -54,9 +54,11 @@ flipper_left = nil
 flipper_right_id = 1
 flipper_left_id = 0
 
+-- A variable to determine if the flipper is fully flicked
+
 -- Whether the flipper is in a flicked state
-flipper_right_up = false
-flipper_left_up = false
+--flipper_right_up = false
+--flipper_left_up = false
 
 -- The acceleration due to gravity
 g = 200
@@ -149,31 +151,31 @@ function init_table()
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
-   E.set_entity_position(flipper, -8, ball_r, 80)
+   E.set_entity_position(flipper, -9, ball_r, 94)
    E.parent_entity(flipper, pivot)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
-   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
-   print(minx, miny, minz, maxx, maxy, maxz)
+   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*2, (maxz-minz)*(ball_r*2)/(maxy-miny))
+   --minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
+   --print(minx, miny, minz, maxx, maxy, maxz)
    --print(maxx-minx, maxy-miny, maxz-minz)
    local x, y, z = E.get_entity_position(flipper)
-   print(x, y, z)
+   --print(x, y, z)
    local flipper_brush = E.create_brush()
    E.set_brush_color(flipper_brush, 255/255, 255/255, 255/255, 1)
    E.set_mesh(flipper, 0, flipper_brush)
-   E.set_entity_body_type(flipper, true)
-   E.set_entity_geom_type(flipper, E.geom_type_box, 3, ball_r*2, 15)
-   E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
-   E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
+   --E.set_entity_body_type(flipper, true)
+   --E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
+   --E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
    E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
-   E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
+   --E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_anchor, -10, 3, 84)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_axis_1, 0, 1, 0)
    E.set_entity_rotation(flipper, 0, 60, 0)
    --E.set_entity_position(flipper, 0, 3, -4)
-   flipper_right = flipper
+   flipper_left = flipper
    --E.set_entity_scale(flipper, 3, 3, 3)
-   E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
    add_circle_bumper(0,0,0)
    add_circle_bumper(5,0,-5)
@@ -336,7 +338,9 @@ function flick_flipper(num, flick)
 	 end
       elseif num == flipper_left_id then
 	 if not flipper_left_up then
-	    -- flick the left flipper
+	    --apply a torque to the flipper
+	    E.add_entity_torque(flipper_left, 0, 150, 0)
+	    print(flipper_left == nil)
 	 end
       end
    else
