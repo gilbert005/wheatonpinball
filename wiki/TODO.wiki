@@ -3,10 +3,10 @@
 
 = Goals =
 
-* Sounds - Stephen
-* Scoreboard
-* 3-ball game
-* Plunger - Hudson
-* Flipper - Tim
-* 2 more action areas
-* Finish line - Stephen
+ * Sounds - Stephen
+ * Scoreboard
+ * 3-ball game
+ * Plunger - Hudson
+ * Flipper - Tim
+ * 2 more action areas
+ * Finish line - Stephen
