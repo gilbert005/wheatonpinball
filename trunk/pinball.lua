@@ -155,7 +155,7 @@ function init_table()
    E.parent_entity(flipper, pivot)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
-   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*2, (maxz-minz)*(ball_r*2)/(maxy-miny))
+   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10, (maxz-minz)*(ball_r*2)/(maxy-miny))
    --minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
    --print(maxx-minx, maxy-miny, maxz-minz)
@@ -339,8 +339,8 @@ function flick_flipper(num, flick)
       elseif num == flipper_left_id then
 	 if not flipper_left_up then
 	    --apply a torque to the flipper
-	    E.add_entity_torque(flipper_left, 0, 150, 0)
-	    print(flipper_left == nil)
+	    --E.add_entity_torque(flipper_left, 0, 150, 0)
+	    --print(flipper_left == nil)
 	 end
       end
    else
