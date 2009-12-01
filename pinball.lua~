@@ -7,9 +7,9 @@ category_all = category_world
 
 -- Position of camera
 camera_x = 0
-camera_y = 170--15--170
-camera_z = 200--200--200
-camera_turn_x = -45---2---45
+camera_y = 17--15--170
+camera_z = 150--200--200
+camera_turn_x = -10---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
 
@@ -149,7 +149,7 @@ function init_table()
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
-   E.set_entity_position(flipper, -8, 3, 80)
+   E.set_entity_position(flipper, -8, ball_r*2, 80)
    E.parent_entity(flipper, pivot)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
@@ -160,7 +160,7 @@ function init_table()
    E.set_brush_color(flipper_brush, 255/255, 255/255, 255/255, 1)
    E.set_mesh(flipper, 0, flipper_brush)
    E.set_entity_body_type(flipper, true)
-   E.set_entity_geom_type(flipper, E.geom_type_capsule, 3, 10)
+   E.set_entity_geom_type(flipper, E.geom_type_box, 3, ball_r*2, 15)
    E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
    E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
    E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
@@ -171,6 +171,7 @@ function init_table()
    --E.set_entity_position(flipper, 0, 3, -4)
    flipper_right = flipper
    --E.set_entity_scale(flipper, 3, 3, 3)
+   E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
 
    add_circle_bumper(0,0,0)
