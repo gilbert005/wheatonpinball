@@ -157,32 +157,34 @@ function init_table()
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
    E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10, (maxz-minz)*(ball_r*2)/(maxy-miny))
+   E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
+   E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
    --print(maxx-minx, maxy-miny, maxz-minz)
    --local x, y, z = E.get_entity_position(flipper)
    --print(x, y, z)
+   E.set_entity_body_type(flipper, true)
    local flipper_brush = E.create_brush()
    E.set_brush_color(flipper_brush, 255/255, 255/255, 255/255, 1)
    E.set_mesh(flipper, 0, flipper_brush)
-   E.set_entity_body_type(flipper, true)
-   E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
-   E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
-   E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
-   E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
+   --E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
    local anchorx, anchorz
    anchorx = -9.6 - ((maxx-minx)/2)*math.sin(60*math.pi/180)
    anchorz = 93.9 - ((maxz-minz)/2)*math.cos(60*math.pi/180)
+   E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_anchor, anchorx, ball_r, anchorz)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_axis_1, 0, 1, 0)
    --E.set_entity_rotation(flipper, 0, 20, 0)
    flipper_left = flipper
    --E.set_entity_scale(flipper, 3, 3, 3)
-   E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
-   add_circle_bumper(0,0,0)
-   add_circle_bumper(5,0,-5)
-   add_circle_bumper(-5,0,-5)
+   add_circle_bumper(0,0)
+   add_circle_bumper(5,-5)
+   add_circle_bumper(-5,-5)
+
+   add_dot(-20, -20)
    --[[
    for i = -40, 40, 20 do
       for j = -70, 40, 20 do
@@ -227,7 +229,7 @@ function init_table()
    return true
 end
 
-function add_circle_bumper(x, y, z)
+function add_circle_bumper(x, z)
    -- A circular bumper twice as wide as the ball
    local bumper_circle = E.create_object("bin/circle_bumper.obj")
    E.parent_entity(bumper_circle, pivot)
@@ -237,7 +239,7 @@ function add_circle_bumper(x, y, z)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(bumper_circle)
    local current_d = maxx-minx
    local current_h = maxy-miny
-   E.set_entity_position(bumper_circle, x+current_d/6.4, y, z+current_d/18)
+   E.set_entity_position(bumper_circle, x+current_d/6.4, 0, z+current_d/18)
    brush1 = E.create_brush()
    E.set_brush_color(brush1, 70/255, 130/255, 180/255, 1)
    brush2 = E.create_brush()
@@ -258,7 +260,7 @@ function add_circle_bumper(x, y, z)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(bumper_circle_geom)
    current_d = maxx-minx
    current_h = maxy-miny
-   E.set_entity_position(bumper_circle_geom, x, y+ball_r, z)
+   E.set_entity_position(bumper_circle_geom, x, ball_r, z)
    E.set_entity_scale(bumper_circle_geom, 2*ball_r*2/current_d, 2*ball_r*2/current_h, 2*ball_r*2/current_d)
    E.set_entity_flags(bumper_circle_geom, E.entity_flag_hidden, true)
    E.set_entity_geom_attr(bumper_circle_geom, E.geom_attr_callback, 3)
@@ -271,8 +273,21 @@ function add_circle_bumper(x, y, z)
    --the y coordinate [5]
    --the z coordinate [6]
    --and a value to determine if the bumper should be returned to its original position [7]
-   bumpers[#bumpers+1] = { bumper_circle_geom, bumper_circle, 0, x+current_d/6.4, y, z+current_d/18, 0 }
+   bumpers[#bumpers+1] = { bumper_circle_geom, bumper_circle, 0, x+current_d/6.4, 0, z+current_d/18, 0 }
 
+end
+
+function add_dot(x, z)
+   local dot = E.create_object("bin/dot.obj")
+   local brush = E.create_brush()
+   E.set_brush_color(brush, 0, 1, 1, 1)
+   E.set_mesh(dot, 0, brush)
+   E.set_brush_color(brush, 0, 100/255, 0, 1)
+   E.set_mesh(dot, 1, brush)
+   E.set_entity_position(dot, x, 0.1, z)
+   E.parent_entity(dot, pivot)
+   E.set_entity_scale(dot, 2, 2, 2)
+   E.turn_entity(dot, 180, 0, 0)
 end
 
 -- Add a ball
@@ -343,6 +358,7 @@ function flick_flipper(num, flick)
 	 if not flipper_left_up then
 	    --apply a torque to the flipper
 	    E.add_entity_torque(flipper_left, 0, 150, 0)
+	    --E.set_entity_rotation(flipper_left, 0, 10, 0)
 	    --print(flipper_left == nil)
 	 end
       end
@@ -354,6 +370,7 @@ function flick_flipper(num, flick)
       elseif num == flipper_left_id then
 	 if flipper_left_up then
 	    -- unflick the left flipper
+	    --E.turn_entity(flipper_left, 0, -10, 0)
 	 end
       end
    end
