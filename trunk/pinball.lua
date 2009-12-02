@@ -6,8 +6,8 @@ category_all = category_world
 
 -- Position of camera
 camera_x = 0
-camera_y = 170--15--170
-camera_z = 200--200--200
+camera_y = 170--27--15--170
+camera_z = 200--30--200--200
 camera_turn_x = -45---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
@@ -65,9 +65,14 @@ g = 200
 -- An array for the bumpers
 bumpers = { }
 
+-- An array for the dots
+dots = { }
+
 -- A variable for the score
 score = 0
 bumper_score = 150
+dot_score = 50
+all_dots_score = 500
 
 
 
@@ -151,12 +156,11 @@ function init_table()
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
-   E.set_entity_position(flipper, -9.6, ball_r, 93.9)
-   E.turn_entity(flipper, 0, 60, 0)
    E.parent_entity(flipper, pivot)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
    E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10, (maxz-minz)*(ball_r*2)/(maxy-miny))
+   E.set_entity_body_type(flipper, true)
    E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
    E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
@@ -164,10 +168,11 @@ function init_table()
    --print(maxx-minx, maxy-miny, maxz-minz)
    --local x, y, z = E.get_entity_position(flipper)
    --print(x, y, z)
-   E.set_entity_body_type(flipper, true)
    local flipper_brush = E.create_brush()
    E.set_brush_color(flipper_brush, 255/255, 255/255, 255/255, 1)
    E.set_mesh(flipper, 0, flipper_brush)
+   E.set_entity_position(flipper, -9.6, ball_r, 93.9)
+   E.turn_entity(flipper, 0, 60, 0)
    --E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
    local anchorx, anchorz
    anchorx = -9.6 - ((maxx-minx)/2)*math.sin(60*math.pi/180)
@@ -184,7 +189,14 @@ function init_table()
    add_circle_bumper(5,-5)
    add_circle_bumper(-5,-5)
 
-   add_dot(-20, -20)
+   --add_dot(-20, -20)
+   --add_dot(-20, 20)
+   --add_dot(20, 20)
+   --add_dot(20, -20)
+   add_dot(-10, -10)
+   add_dot(-10, 10)
+   add_dot(10, 10)
+   add_dot(10, -10)
    --[[
    for i = -40, 40, 20 do
       for j = -70, 40, 20 do
@@ -233,16 +245,15 @@ function add_circle_bumper(x, z)
    -- A circular bumper twice as wide as the ball
    local bumper_circle = E.create_object("bin/circle_bumper.obj")
    E.parent_entity(bumper_circle, pivot)
-   --E.set_entity_geom_type(bumper_circle, E.geom_type_capsule, 1, 1)
    E.turn_entity(bumper_circle, -90, 0, 0)
    --E.set_entity_scale(bumper_circle, 2, 2, 2)
-   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(bumper_circle)
+   local minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(bumper_circle)
    local current_d = maxx-minx
    local current_h = maxy-miny
    E.set_entity_position(bumper_circle, x+current_d/6.4, 0, z+current_d/18)
-   brush1 = E.create_brush()
+   local brush1 = E.create_brush()
    E.set_brush_color(brush1, 70/255, 130/255, 180/255, 1)
-   brush2 = E.create_brush()
+   local brush2 = E.create_brush()
    E.set_brush_color(brush2, 0, 191/255, 1.0, 1)
    E.set_mesh(bumper_circle, 0, brush1)
    E.set_mesh(bumper_circle, 1, brush2)
@@ -250,7 +261,7 @@ function add_circle_bumper(x, z)
    E.set_mesh(bumper_circle, 3, brush2)
    E.set_entity_scale(bumper_circle, 2*ball_r*2/current_d, 2*ball_r*2/current_h, 2*ball_r*2/current_d)
    --E.set_entity_flags(bumper_circle, E.entity_flag_wireframe, true)
-   E.set_entity_geom_attr(bumper_circle, E.geom_attr_callback, 0)
+   --E.set_entity_geom_attr(bumper_circle, E.geom_attr_callback, 0)
 
    local bumper_circle_geom = E.create_object("bin/circle_bumper.obj")
    E.parent_entity(bumper_circle_geom, pivot)
@@ -258,8 +269,8 @@ function add_circle_bumper(x, z)
    E.set_entity_geom_type(bumper_circle_geom, E.geom_type_capsule, ball_r*1.55, ball_r*2)
    E.turn_entity(bumper_circle_geom, -90, 0, 0)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(bumper_circle_geom)
-   current_d = maxx-minx
-   current_h = maxy-miny
+   local current_d = maxx-minx
+   local current_h = maxy-miny
    E.set_entity_position(bumper_circle_geom, x, ball_r, z)
    E.set_entity_scale(bumper_circle_geom, 2*ball_r*2/current_d, 2*ball_r*2/current_h, 2*ball_r*2/current_d)
    E.set_entity_flags(bumper_circle_geom, E.entity_flag_hidden, true)
@@ -278,16 +289,28 @@ function add_circle_bumper(x, z)
 end
 
 function add_dot(x, z)
-   local dot = E.create_object("bin/dot.obj")
-   local brush = E.create_brush()
-   E.set_brush_color(brush, 0, 1, 1, 1)
-   E.set_mesh(dot, 0, brush)
-   E.set_brush_color(brush, 0, 100/255, 0, 1)
-   E.set_mesh(dot, 1, brush)
-   E.set_entity_position(dot, x, 0.1, z)
+   local dot = E.create_object("bin/dot2.obj")
    E.parent_entity(dot, pivot)
-   E.set_entity_scale(dot, 2, 2, 2)
-   E.turn_entity(dot, 180, 0, 0)
+   local brush1 = E.create_brush()
+   E.set_brush_color(brush1, 70/255, 130/255, 180/255, 1)
+   local brush2 = E.create_brush()
+   E.set_brush_color(brush2, 1, 1, 0, 1)
+   E.set_mesh(dot, 0, brush1)
+   E.set_mesh(dot, 1, brush2)
+   --E.turn_entity(dot, 90, 0, 0)
+   E.set_entity_geom_type(dot, E.geom_type_ray, x, 0, z, 0, 20, 0)
+   --E.turn_entity(dot, -90, 0, 0)
+   E.set_entity_flags(dot, E.entity_flag_visible_geom, true)
+   --E.set_entity_geom_attr(dot, E.geom_attr_collider, 0)
+   E.set_entity_geom_attr(dot, E.geom_attr_callback, 4)
+   E.set_entity_position(dot, x, 0.1, z)
+   
+   --The dotss array holds an array for each dot, each having:
+   --the dot [1]
+   --and a boolean value to determine if the dot is on [2]
+   dots[#dots+1] = { dot, false }
+   --E.set_entity_scale(dot, 5, 5, 5)
+   --E.turn_entity(dot, 180, 0, 0)
 end
 
 -- Add a ball
@@ -409,6 +432,23 @@ function do_timer(dt)
 	 end
       end
    end
+   local all_dots_on = true
+   for i,v in ipairs(dots) do
+      if not v[2] then
+	 all_dots_on = false
+	 break
+      end
+   end
+   if all_dots_on then
+      score = score + all_dots_score
+      for i,v in ipairs(dots) do
+	 local brush = E.create_brush()
+	 E.set_brush_color(brush, 1, 1, 0, 1)
+	 E.set_mesh(v[1], 1, brush)
+	 v[2] = false
+      end
+      toReturn = true
+   end
    if not (ball == nil) then
       apply_gravity()
       toReturn = true
@@ -432,12 +472,12 @@ function do_keyboard(key, down)
 end
 
 function reset()
-	print("aHHHH")
-      ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
-      ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
-      E.delete_entity(ball)
-      ball = nil
-      add_ball()
+   print("aHHHH")
+   ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
+   ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
+   E.delete_entity(ball)
+   ball = nil
+   add_ball()
 end
 -- mouse move
 function do_point(dX, dY)
@@ -461,38 +501,39 @@ function do_click(b, s)
 end
 
 function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
-   local brush = E.create_brush()
-   E.set_brush_color(brush, 1, 0, 0, 1)
-	if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
-		bumpsound = E.load_sound("bin/boing.ogg")
-		--E.set_sound_emitter(bumpsound, ball)
-		E.play_sound(bumpsound)
-	end
-   for i,v in ipairs(bumpers) do
-      --through experiment, it appears that the bumper will only be entityB, though entityA is still checked
-      if v[1] == entityB and ball == entityA then
-	bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
-	--E.set_sound_emitter(bumpsound, ball)
-	E.play_sound(bumpsound)
-	 E.add_entity_force(ball, 400*nx, 0, 400*nz)
-	 E.set_mesh(v[2], 1, brush)
-	 E.set_mesh(v[2], 3, brush)
-	 v[3] = 10
-	 v[7] = 2
-	 score = score + bumper_score
-	 local x, y, z = E.get_entity_position(v[2])
-	 E.set_entity_position(v[2], x - nx/2, y, z - nz/2)
-	 return true
-      elseif v[1] == entityA and ball == entityB then
-	 E.add_entity_force(ball, -400*nx, 0, -400*nz)
-	 E.set_mesh(v[2], 1, brush)
-	 E.set_mesh(v[2], 3, brush)
-	 v[3] = 10
-	 v[7] = 2
-	 score = score + bumper_score
-	 local x, y, z = E.get_entity_position(v[2])
-	 E.set_entity_position(v[2], x + nx/2, y, z + nz/2)
-	 return true
+   if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
+      bumpsound = E.load_sound("bin/boing.ogg")
+      --E.set_sound_emitter(bumpsound, ball)
+      E.play_sound(bumpsound)
+   end
+   if ball == entityA or ball == entityB then
+      for i,v in ipairs(bumpers) do
+	 if v[1] == entityB or v[1] == entityA then
+	    bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
+	    --E.set_sound_emitter(bumpsound, ball)
+	    E.play_sound(bumpsound)
+	    E.add_entity_force(ball, 400*nx, 0, 400*nz)
+	    local brush = E.create_brush()
+	    E.set_brush_color(brush, 1, 0, 0, 1)
+	    E.set_mesh(v[2], 1, brush)
+	    E.set_mesh(v[2], 3, brush)
+	    v[3] = 10
+	    v[7] = 2
+	    score = score + bumper_score
+	    local x, y, z = E.get_entity_position(v[2])
+	    E.set_entity_position(v[2], x - nx/2, y, z - nz/2)
+	    return true
+	 end
+      end
+
+      for i,v in ipairs(dots) do
+	 if v[1] == entityB or v[1] == entityA then
+	    local brush = E.create_brush()
+	    E.set_brush_color(brush, 1, 0, 0, 1)
+	    E.set_mesh(v[1], 1, brush)
+	    score = score + dot_score
+	    return true
+	 end
       end
    end
    return false
