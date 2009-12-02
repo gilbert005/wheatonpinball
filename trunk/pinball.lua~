@@ -148,20 +148,6 @@ function init_table()
    E.turn_entity(wall_se, 0, 35, 0)
    
 	--finish line
-	finline = E.create_object("bin/flipper2.obj")
-   E.set_entity_position(finline, 0.0, wall_h/2, table_l/2)
-   E.set_entity_geom_type(finline, E.geom_type_box, table_w, wall_h*10, 0)
-   E.parent_entity(finline, pivot)
-   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(finline)
-   local current_l = maxx-minx
-   current_h = maxy-miny
-   current_th = maxz-minz
-   --E.set_entity_scale(finline, table_w/current_l, wall_h/current_h, wall_th/current_th)
-   E.set_entity_flags(finline, E.entity_flag_wireframe, true)
-   E.set_entity_geom_attr(finline, E.geom_attr_callback, 3)
-	--E.set_entity_geom_attr(finline, E.geom_attr_soft_cfm, 1.0)
-	E.set_entity_flags(finline, E.entity_flag_visible_geom, true)
-
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
@@ -171,28 +157,28 @@ function init_table()
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
    E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10, (maxz-minz)*(ball_r*2)/(maxy-miny))
+   E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
+   E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
    --print(maxx-minx, maxy-miny, maxz-minz)
    --local x, y, z = E.get_entity_position(flipper)
    --print(x, y, z)
+   E.set_entity_body_type(flipper, true)
    local flipper_brush = E.create_brush()
    E.set_brush_color(flipper_brush, 255/255, 255/255, 255/255, 1)
    E.set_mesh(flipper, 0, flipper_brush)
-   E.set_entity_body_type(flipper, true)
-   E.set_entity_geom_attr(flipper, E.geom_attr_category, category_world)
-   E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_all)
-   E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
-   E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
+   --E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
    local anchorx, anchorz
    anchorx = -9.6 - ((maxx-minx)/2)*math.sin(60*math.pi/180)
    anchorz = 93.9 - ((maxz-minz)/2)*math.cos(60*math.pi/180)
+   E.set_entity_joint_type(flipper, plane, E.joint_type_hinge)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_anchor, anchorx, ball_r, anchorz)
    E.set_entity_joint_attr(flipper, plane, E.joint_attr_axis_1, 0, 1, 0)
    --E.set_entity_rotation(flipper, 0, 20, 0)
    flipper_left = flipper
    --E.set_entity_scale(flipper, 3, 3, 3)
-   E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
    add_circle_bumper(0,0,0)
    add_circle_bumper(5,0,-5)
@@ -458,12 +444,6 @@ function do_click(b, s)
 end
 
 function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
-	if finline == entityA then --or finline == entityA then
-		print("a" , finline)
-		print(ball)
-		print("what the?")
-		--reset()
-	end
    local brush = E.create_brush()
    E.set_brush_color(brush, 1, 0, 0, 1)
 	if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
