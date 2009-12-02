@@ -4,7 +4,6 @@
 category_world = 4
 category_all = category_world
 
-
 -- Position of camera
 camera_x = 0
 camera_y = 170--15--170
@@ -122,7 +121,7 @@ function init_table()
    local sin_theta = math.sin(theta*math.pi/180)
 
    -- The south west wall
-   local wall_sw = E.create_object("bin/box.obj")
+   wall_sw = E.create_object("bin/box.obj")
    E.set_entity_position(wall_sw, -table_w/3-cos_theta*wall_th/2, wall_h/2, table_l/2-(sin_theta*wall_th/2 + cos_theta*cos_theta*table_w/3))
    E.set_entity_geom_type(wall_sw, E.geom_type_box, (table_w/3)/cos_theta, wall_h*10, wall_th)
    E.parent_entity(wall_sw, pivot)
@@ -133,9 +132,10 @@ function init_table()
    current_th = maxz-minz
    E.set_entity_scale(wall_sw, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_sw, 0, -35, 0)
+   E.set_entity_geom_attr(wall_sw, E.geom_attr_callback, 3)
 
    -- The south east wall
-   local wall_se = E.create_object("bin/box.obj")
+   wall_se = E.create_object("bin/box.obj")
    E.set_entity_position(wall_se, table_w/3+cos_theta*wall_th/2, wall_h/2, table_l/2-(sin_theta*wall_th/2 + cos_theta*cos_theta*table_w/3))
    E.set_entity_geom_type(wall_se, E.geom_type_box, (table_w/3)/cos_theta, wall_h*10, wall_th)
    E.parent_entity(wall_se, pivot)
@@ -147,7 +147,7 @@ function init_table()
    E.set_entity_scale(wall_se, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_se, 0, 35, 0)
    
-
+	--finish line
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
@@ -408,16 +408,20 @@ function do_keyboard(key, down)
       flick_flipper(flipper_left_id, down)
       return true
    elseif key == E.key_r and not down then --reset the pinball
-      ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
-      ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
-      E.delete_entity(ball)
-      ball = nil
-      add_ball()
+		reset()
       return true
    end
    return false
 end
 
+function reset()
+	print("aHHHH")
+      ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
+      ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
+      E.delete_entity(ball)
+      ball = nil
+      add_ball()
+end
 -- mouse move
 function do_point(dX, dY)
    mouse_X = mouse_X + dX
@@ -442,9 +446,17 @@ end
 function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
    local brush = E.create_brush()
    E.set_brush_color(brush, 1, 0, 0, 1)
+	if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
+		bumpsound = E.load_sound("bin/boing.ogg")
+		--E.set_sound_emitter(bumpsound, ball)
+		E.play_sound(bumpsound)
+	end
    for i,v in ipairs(bumpers) do
       --through experiment, it appears that the bumper will only be entityB, though entityA is still checked
       if v[1] == entityB and ball == entityA then
+	bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
+	--E.set_sound_emitter(bumpsound, ball)
+	E.play_sound(bumpsound)
 	 E.add_entity_force(ball, 400*nx, 0, 400*nz)
 	 E.set_mesh(v[2], 1, brush)
 	 E.set_mesh(v[2], 3, brush)
@@ -529,8 +541,11 @@ function do_start()
     E.print_console("Type F1 to toggle this console.\n")
     E.print_console("Type F2 to toggle full-screen.\n")
     E.print_console("Type escape to exit this program.\n")
+    E.print_console("Type 'r' to reset the ball\n")
 
     E.enable_timer(true)
+	--E.set_sound_receiver(camera, 400)
+   --E.set_entity_flags(camera, E.entity_flag_wireframe, true)
     
 end
 
