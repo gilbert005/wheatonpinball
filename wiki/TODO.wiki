@@ -8,5 +8,5 @@
  * 3-ball game
  * Plunger - Hudson
  * Flipper - Tim
- * 2 more action areas
+ * 1 more action area
  * Finish line - Stephen
