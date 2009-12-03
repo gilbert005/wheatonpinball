@@ -12,6 +12,11 @@ camera_turn_x = -45---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
 
+-- Position of light
+light_x = 0.0
+light_y = 60.0
+light_z = 50.0
+
 -- Scaling constant (distance units per cm)
 scale = 1.43163923
 
@@ -74,6 +79,10 @@ bumper_score = 150
 dot_score = 50
 all_dots_score = 500
 
+level = 1
+bumper_rgb = { { 0, 191/255, 1 }, { 124/255, 252/255, 0 }, { 1, 1, 0 }, { 1, 20/255, 147/255 } }
+dot_rgb = { { 1, 1, 0 }, { 1, 0, 0 } }
+all_dots_on_timer = 0
 
 
 ----- Helper functions
@@ -186,17 +195,17 @@ function init_table()
    --E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
    add_circle_bumper(0,0)
-   add_circle_bumper(5,-5)
-   add_circle_bumper(-5,-5)
+   add_circle_bumper(8,-8)
+   add_circle_bumper(-8,-8)
 
-   --add_dot(-20, -20)
-   --add_dot(-20, 20)
-   --add_dot(20, 20)
-   --add_dot(20, -20)
-   add_dot(-10, -10)
-   add_dot(-10, 10)
-   add_dot(10, 10)
-   add_dot(10, -10)
+   add_dot(-20, -20)
+   add_dot(-20, 20)
+   add_dot(20, 20)
+   add_dot(20, -20)
+   --add_dot(-10, -10)
+   --add_dot(-10, 10)
+   --add_dot(10, 10)
+   --add_dot(10, -10)
    --[[
    for i = -40, 40, 20 do
       for j = -70, 40, 20 do
@@ -254,7 +263,7 @@ function add_circle_bumper(x, z)
    local brush1 = E.create_brush()
    E.set_brush_color(brush1, 70/255, 130/255, 180/255, 1)
    local brush2 = E.create_brush()
-   E.set_brush_color(brush2, 0, 191/255, 1.0, 1)
+   E.set_brush_color(brush2, bumper_rgb[level][1], bumper_rgb[level][2], bumper_rgb[level][3], 1)
    E.set_mesh(bumper_circle, 0, brush1)
    E.set_mesh(bumper_circle, 1, brush2)
    E.set_mesh(bumper_circle, 2, brush1)
@@ -294,13 +303,13 @@ function add_dot(x, z)
    local brush1 = E.create_brush()
    E.set_brush_color(brush1, 70/255, 130/255, 180/255, 1)
    local brush2 = E.create_brush()
-   E.set_brush_color(brush2, 1, 1, 0, 1)
+   E.set_brush_color(brush2, dot_rgb[1][1], dot_rgb[1][2], dot_rgb[1][3], 1)
    E.set_mesh(dot, 0, brush1)
    E.set_mesh(dot, 1, brush2)
    --E.turn_entity(dot, 90, 0, 0)
-   E.set_entity_geom_type(dot, E.geom_type_ray, x, 0, z, 0, 20, 0)
+   E.set_entity_geom_type(dot, E.geom_type_ray, 0, 0, 0, 0, 20, 0)
    --E.turn_entity(dot, -90, 0, 0)
-   E.set_entity_flags(dot, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(dot, E.entity_flag_visible_geom, true)
    --E.set_entity_geom_attr(dot, E.geom_attr_collider, 0)
    E.set_entity_geom_attr(dot, E.geom_attr_callback, 4)
    E.set_entity_position(dot, x, 0.1, z)
@@ -425,29 +434,47 @@ function do_timer(dt)
 	 v[3] = v[3] - 1
 	 if v[3] == 0 then
 	    local brush = E.create_brush()
-	    E.set_brush_color(brush, 0, 191/255, 1.0, 1)
+	    E.set_brush_color(brush, bumper_rgb[level][1], bumper_rgb[level][2], bumper_rgb[level][3], 1)
 	    E.set_mesh(v[2], 1, brush)
 	    E.set_mesh(v[2], 3, brush)
 	    toReturn = true
 	 end
       end
    end
-   local all_dots_on = true
-   for i,v in ipairs(dots) do
-      if not v[2] then
-	 all_dots_on = false
-	 break
+   
+   if all_dots_on_timer > 0 then
+      all_dots_on_timer = all_dots_on_timer - 1
+      if all_dots_on_timer == 0 then
+	 score = score + all_dots_score
+	 if level < 4 then
+	    level = level + 1
+	    for i,v in ipairs(bumpers) do
+	       local brush = E.create_brush()
+	       E.set_brush_color(brush, bumper_rgb[level][1], bumper_rgb[level][2], bumper_rgb[level][3], 1)
+	       E.set_mesh(v[2], 1, brush)
+	       E.set_mesh(v[2], 3, brush)
+	    end
+	 end
+	 for i,v in ipairs(dots) do
+	    local brush = E.create_brush()
+	    E.set_brush_color(brush, dot_rgb[1][1], dot_rgb[1][2], dot_rgb[1][3], 1)
+	    E.set_mesh(v[1], 1, brush)
+	    v[2] = false
+	    
+	 end
+	 toReturn = true
+      else
+	 for i,v in ipairs(dots) do
+	    local value = all_dots_on_timer/10
+	    local brush_num = 2 - ( ( (value - (value % 1) ) % 2))
+	    
+	    print(all_dots_on_timer)
+	    print(value)
+	    local brush = E.create_brush()
+	    E.set_brush_color(brush, dot_rgb[brush_num][1], dot_rgb[brush_num][2], dot_rgb[brush_num][3], 1)
+	    E.set_mesh(v[1], 1, brush)
+	 end
       end
-   end
-   if all_dots_on then
-      score = score + all_dots_score
-      for i,v in ipairs(dots) do
-	 local brush = E.create_brush()
-	 E.set_brush_color(brush, 1, 1, 0, 1)
-	 E.set_mesh(v[1], 1, brush)
-	 v[2] = false
-      end
-      toReturn = true
    end
    if not (ball == nil) then
       apply_gravity()
@@ -465,14 +492,37 @@ function do_keyboard(key, down)
       flick_flipper(flipper_left_id, down)
       return true
    elseif key == E.key_r and not down then --reset the pinball
-		reset()
+      reset()
       return true
+   --[[elseif key == E.key_x then
+      light_x = light_x + 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true
+   elseif key == E.key_y then
+      light_y = light_y + 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true
+   elseif key == E.key_z then
+      light_z = light_z + 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true
+   elseif key == E.key_s then
+      light_x = light_x - 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true
+   elseif key == E.key_h then
+      light_y = light_y - 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true
+   elseif key == E.key_a then
+      light_z = light_z - 5
+      E.set_entity_position(light, light_x, light_y, light_z)
+      return true]]
    end
    return false
 end
 
 function reset()
-   print("aHHHH")
    ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
    ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
    E.delete_entity(ball)
@@ -490,7 +540,7 @@ end
 function do_click(b, s)
    if b == 1 and not s then
       if not (ball == nil) then
-	 force_x = math.random(-30, 30)
+	 force_x = 0--math.random(-30, 30)
 	 force_y = 0
 	 force_z = -1000
 	 E.add_entity_force(ball, force_x, force_y, force_z)
@@ -529,9 +579,20 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
       for i,v in ipairs(dots) do
 	 if v[1] == entityB or v[1] == entityA then
 	    local brush = E.create_brush()
-	    E.set_brush_color(brush, 1, 0, 0, 1)
+	    E.set_brush_color(brush, dot_rgb[2][1], dot_rgb[2][2], dot_rgb[2][3], 1)
 	    E.set_mesh(v[1], 1, brush)
 	    score = score + dot_score
+	    v[2] = true
+	    local all_dots_on = true
+	    for i,v in ipairs(dots) do
+	       if not v[2] then
+		  all_dots_on = false
+		  break
+	       end
+	    end
+	    if all_dots_on then
+	       all_dots_on_timer = 140
+	    end
 	    return true
 	 end
       end
@@ -575,21 +636,25 @@ function do_start()
     E.set_entity_geom_attr(plane, E.geom_attr_collider, category_all)
     E.set_entity_geom_attr(plane, E.geom_attr_friction, table_friction)
     local brush = E.create_brush()
-    E.set_brush_color(brush, 0.6, 1, 0.6, 1)
+    local plane_r = 0.2--0.6
+    local plane_g = 0.2--1
+    local plane_b = 0.2--0.6
+    E.set_brush_color(brush, plane_r, plane_g, plane_b, 1)
     E.set_mesh(plane, 0, brush)
     E.set_mesh(plane, 1, brush)
     local minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(plane)
-    local current_l = maxx-minx
+    current_l = maxx-minx
     if current_l < 0 then current_l = -current_l end
-    local current_w = maxz-minz
+    current_w = maxz-minz
     if current_w < 0 then current_w = -current_w end
 
     -- locate light
-    E.set_entity_position(light, 0.0, 60.0, 40.0)
+    E.set_entity_position(light, light_x, light_y, light_z)
 
     -- Scale items
-    --E.set_entity_scale(pivot, 1, 1, 1)
-    E.set_entity_scale(plane, table_w/current_l, 1, table_l/current_w)
+    local scale_x = table_w/current_l
+    local scale_z = table_l/current_w
+    E.set_entity_scale(plane, scale_x, 1, scale_z)
 
     -- Tilt the table down
     --E.turn_entity(pivot, 0, 0, 10)
