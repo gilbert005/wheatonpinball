@@ -90,7 +90,7 @@ all_dots_on_timer = 0
 
 plunger = nil
 plunger_force = 0
-max_plunger_force = 5000
+max_plunger_force = 4000
 plunger_z = 0
 plunger_z_max = 15
 plunger_z_max_timer = 20
