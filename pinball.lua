@@ -163,7 +163,6 @@ function init_table()
    current_th = maxz-minz
    E.set_entity_scale(wall_sw, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_sw, 0, -35, 0)
-   E.set_entity_geom_attr(wall_sw, E.geom_attr_callback, 3)
 
    -- The south east wall
    wall_se = E.create_object("bin/box.obj")
@@ -266,7 +265,7 @@ function init_table()
    E.parent_entity(roof, pivot)
    E.set_entity_flags(roof, E.entity_flag_hidden, true)
 
-   --[[finish line
+   --finish line
    finish_line = E.create_object()
    E.parent_entity(finish_line, pivot)
    E.set_entity_geom_type(finish_line, E.geom_type_box, table_w, wall_th, wall_th)
@@ -275,7 +274,7 @@ function init_table()
    E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
    E.set_entity_geom_attr(finish_line, E.geom_attr_bounce, wall_bounce)
    E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
-   ]]
+   
 
 
    add_circle_bumper(0,0)
@@ -308,8 +307,6 @@ function init_table()
    E.set_entity_geom_attr(wall_west, E.geom_attr_callback, 0)
    E.set_entity_geom_attr(wall_east, E.geom_attr_callback, 0)
    E.set_entity_geom_attr(wall_north, E.geom_attr_callback, 0)
-   E.set_entity_geom_attr(wall_sw, E.geom_attr_callback, 0)
-   E.set_entity_geom_attr(wall_se, E.geom_attr_callback, 0)
    E.set_entity_geom_attr(wall_west, E.geom_attr_bounce, wall_bounce)
    E.set_entity_geom_attr(wall_east, E.geom_attr_bounce, wall_bounce)
    E.set_entity_geom_attr(wall_north, E.geom_attr_bounce, wall_bounce)
@@ -321,8 +318,8 @@ function init_table()
    E.set_entity_geom_attr(wall_sw, E.geom_attr_friction, wall_friction)
    E.set_entity_geom_attr(wall_se, E.geom_attr_friction, wall_friction)
 
-   E.set_entity_geom_attr(wall_sw, E.geom_attr_category, category_world)
-   E.set_entity_geom_attr(wall_se, E.geom_attr_category, category_world)
+   E.set_entity_geom_attr(wall_sw, E.geom_attr_category, 2)
+   E.set_entity_geom_attr(wall_se, E.geom_attr_category, 2)
    E.set_entity_geom_attr(roof, E.geom_attr_category, category_world)
    E.set_entity_geom_attr(wall_sw, E.geom_attr_collider, category_ball)
    E.set_entity_geom_attr(wall_se, E.geom_attr_collider, category_ball)
@@ -828,10 +825,11 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	end
 	--Ball hit angled bumper
    if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
+		print("Boing!!!")
       local bumpsound = E.load_sound("bin/boing.ogg")
       --E.set_sound_emitter(bumpsound, ball)
       E.play_sound(bumpsound)
-	E.free_sound(bumpsound)
+	--E.free_sound(bumpsound)
    end
    if ball == entityA or ball == entityB then
       for i,v in ipairs(bumpers) do
@@ -840,7 +838,7 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	    local bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
 	    --E.set_sound_emitter(bumpsound, ball)
 	    E.play_sound(bumpsound)
-		E.free_sound(bumpsound)
+		--E.free_sound(bumpsound)
 	    E.add_entity_force(ball, 400*nx, 0, 400*nz)
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, 1, 0, 0, 1)
