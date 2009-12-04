@@ -868,7 +868,7 @@ function do_start()
    
     -- Set up light
     light = E.create_light(E.light_type_positional)
-
+    E.set_light_color(light, 1, 1, 1)
     -- Set up item to hang things off of for scaling
     pivot = E.create_pivot()
 
@@ -942,7 +942,7 @@ function do_start()
     E.enable_timer(true)
 	--E.set_sound_receiver(camera, 400)
    --E.set_entity_flags(camera, E.entity_flag_wireframe, true)
-
+   E.set_typeface("bin/Adventure_Subtitles_Normal.ttf")
 
 end
 
