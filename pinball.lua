@@ -90,7 +90,7 @@ all_dots_on_timer = 0
 
 plunger = nil
 plunger_force = 0
-max_plunger_force = 4000
+max_plunger_force = 3000
 plunger_z = 0
 plunger_z_max = 15
 plunger_z_max_timer = 20
@@ -427,7 +427,7 @@ function add_flippers()
 
    E.set_entity_body_type(flipper, true)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
-   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10*2, (maxz-minz)*(ball_r*2*2)/(maxy-miny))
+   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(1.7*(maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2*2)/(2*(maxy-miny)))
 
 
    --E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
@@ -466,7 +466,7 @@ function add_flippers()
 
    E.set_entity_body_type(flipper2, true)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper2)
-   E.set_entity_geom_type(flipper2, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10*2, (maxz-minz)*(ball_r*2* 2)/(maxy-miny))
+   E.set_entity_geom_type(flipper2, E.geom_type_box, (maxx-minx)*(ball_r*2)/(1.7*(maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2* 2)/(2*(maxy-miny)))
 
 
    --E.set_entity_scale(flipper2, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
