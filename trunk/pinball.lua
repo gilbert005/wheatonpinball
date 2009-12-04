@@ -6,11 +6,12 @@ category_all = category_world
 
 -- Position of camera
 camera_x = 0
-camera_y = 170--27--15--170
+camera_y = 170--15--170
 camera_z = 200--30--200--200
 camera_turn_x = -45---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
+cam = true
 
 -- Position of light
 light_x = 0.0
@@ -49,6 +50,7 @@ mouse_Y = 0
 
 -- A variable to determine if the ball has been launched yet
 before_launch = true
+launch_count = 0
 
 -- Flippers
 flipper_right = nil
@@ -95,7 +97,7 @@ function init_table()
    E.set_brush_color(brush, wall_r, wall_g, wall_b, 1)
 
    --The west wall
-   local wall_west = E.create_object("bin/box.obj")
+   wall_west = E.create_object("bin/box.obj")
    E.set_entity_position(wall_west, -table_w/2 - wall_th/2, wall_h/2, 0.0)
    E.set_entity_geom_type(wall_west, E.geom_type_box, wall_th, wall_h*10, table_l+2*wall_th)
    E.parent_entity(wall_west, pivot)
@@ -107,7 +109,7 @@ function init_table()
    E.set_entity_scale(wall_west, wall_th/current_th, wall_h/current_h, (table_l+2*wall_th)/current_w)
    
    -- The east wall
-   local wall_east = E.create_object("bin/box.obj")
+   wall_east = E.create_object("bin/box.obj")
    E.set_entity_position(wall_east, table_w/2 + wall_th/2, wall_h/2, 0.0)
    E.set_entity_geom_type(wall_east, E.geom_type_box, wall_th, wall_h*10, table_l+2*wall_th)
    E.parent_entity(wall_east, pivot)
@@ -119,7 +121,7 @@ function init_table()
    E.set_entity_scale(wall_east, wall_th/current_th, wall_h/current_h, (table_l+2*wall_th)/current_w)
 
    -- The north wall
-   local wall_north = E.create_object("bin/box.obj")
+   wall_north = E.create_object("bin/box.obj")
    E.set_entity_position(wall_north, 0.0, wall_h/2, -table_l/2-wall_th/2)
    E.set_entity_geom_type(wall_north, E.geom_type_box, table_w, wall_h*10, wall_th)
    E.parent_entity(wall_north, pivot)
@@ -161,7 +163,16 @@ function init_table()
    E.set_entity_scale(wall_se, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_se, 0, 35, 0)
    
-	--finish line
+	--FINISH LINE
+
+	finish_line = E.create_object()
+    E.parent_entity(finish_line, pivot)
+    E.set_entity_geom_type(finish_line, E.geom_type_box, table_w, wall_th, wall_th)
+	E.set_entity_position(finish_line, 0, 0, table_l/2+wall_th/2)
+   --Allow ball to pass through the finish line
+    E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
+   E.set_entity_geom_attr(finish_line, E.geom_attr_bounce, wall_bounce)
+	E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
@@ -283,7 +294,7 @@ function add_circle_bumper(x, z)
    E.set_entity_position(bumper_circle_geom, x, ball_r, z)
    E.set_entity_scale(bumper_circle_geom, 2*ball_r*2/current_d, 2*ball_r*2/current_h, 2*ball_r*2/current_d)
    E.set_entity_flags(bumper_circle_geom, E.entity_flag_hidden, true)
-   E.set_entity_geom_attr(bumper_circle_geom, E.geom_attr_callback, 3)
+   --E.set_entity_geom_attr(bumper_circle_geom, E.geom_attr_callback, 3)
 
    --The bumpers array holds an array for each bumper, each having:
    --the geom [1],
@@ -294,7 +305,8 @@ function add_circle_bumper(x, z)
    --the z coordinate [6]
    --and a value to determine if the bumper should be returned to its original position [7]
    bumpers[#bumpers+1] = { bumper_circle_geom, bumper_circle, 0, x+current_d/6.4, 0, z+current_d/18, 0 }
-
+	--print("bump", bumper_circle)
+	--print("bumpgeom", bumper_circle_geom)
 end
 
 function add_dot(x, z)
@@ -376,7 +388,7 @@ function add_ball()
 
     ball = object
 
-    return object
+    --return ball
 end
 
 -- Flicks the flipper up if flick is true, otherwise it "unflicks" it
@@ -417,6 +429,26 @@ function apply_gravity()
    return true
 end
 
+function cameraChange()
+
+	if cam then
+	
+camera_x = 0
+camera_y = 300
+camera_z = 0
+camera_turn_x = -45  -- -90 from original
+    E.set_entity_position(camera, camera_x, camera_y, camera_z)
+	E.turn_entity(camera, camera_turn_x,0,0)
+	else
+camera_x = 0
+camera_y = 170
+camera_z = 200
+camera_turn_x = 45 -- -45 from original
+    E.set_entity_position(camera, camera_x, camera_y, camera_z)
+	E.turn_entity(camera, camera_turn_x,0,0)
+	end
+	cam = not cam
+end
 ---- Event functions
 -- timer (idle function)
 function do_timer(dt)
@@ -494,6 +526,9 @@ function do_keyboard(key, down)
    elseif key == E.key_r and not down then --reset the pinball
       reset()
       return true
+   elseif key == E.key_c and not down then --change the camera view
+      cameraChange()
+      return true
    --[[elseif key == E.key_x then
       light_x = light_x + 5
       E.set_entity_position(light, light_x, light_y, light_z)
@@ -524,10 +559,12 @@ end
 
 function reset()
    ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
-   ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
+  ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
    E.delete_entity(ball)
    ball = nil
    add_ball()
+	launch_count = launch_count + 1
+	print("reset ", launch_count)
 end
 -- mouse move
 function do_point(dX, dY)
@@ -551,17 +588,31 @@ function do_click(b, s)
 end
 
 function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
+	--Compare entities and their callback and category values
+	--if ball == entityA then print(px, entityB, entityA) else print(px, entityA, entityB) 
+	--print("aCat, bCall", E.get_entity_geom_attr(entityA, E.geom_attr_category),E.get_entity_geom_attr(entityB, E.geom_attr_callback))
+	--print("bCat, aCall", E.get_entity_geom_attr(entityB, E.geom_attr_category),E.get_entity_geom_attr(entityA, E.geom_attr_callback))
+	--end
+
+	--Ball crossed finish line
+	if finish_line == entityB or finish_line == entityA then
+		reset()
+	end
+	--Ball hit angled bumper
    if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
-      bumpsound = E.load_sound("bin/boing.ogg")
+      local bumpsound = E.load_sound("bin/boing.ogg")
       --E.set_sound_emitter(bumpsound, ball)
       E.play_sound(bumpsound)
+	E.free_sound(bumpsound)
    end
    if ball == entityA or ball == entityB then
       for i,v in ipairs(bumpers) do
+		--Ball hit peg
 	 if v[1] == entityB or v[1] == entityA then
-	    bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
+	    local bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
 	    --E.set_sound_emitter(bumpsound, ball)
 	    E.play_sound(bumpsound)
+		E.free_sound(bumpsound)
 	    E.add_entity_force(ball, 400*nx, 0, 400*nz)
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, 1, 0, 0, 1)
@@ -577,6 +628,7 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
       end
 
       for i,v in ipairs(dots) do
+		--Ball passed over dot
 	 if v[1] == entityB or v[1] == entityA then
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, dot_rgb[2][1], dot_rgb[2][2], dot_rgb[2][3], 1)
@@ -664,7 +716,8 @@ function do_start()
     E.print_console("Type F1 to toggle this console.\n")
     E.print_console("Type F2 to toggle full-screen.\n")
     E.print_console("Type escape to exit this program.\n")
-    E.print_console("Type 'r' to reset the ball\n")
+    E.print_console("Type 'r' to reset the ball.\n")
+    E.print_console("Type 'c' to change the camera view.\n")
 
     E.enable_timer(true)
 	--E.set_sound_receiver(camera, 400)
@@ -675,4 +728,14 @@ end
 do_start()
 init_table()
 add_ball()
+
+
+--print("plane",plane)
+--print("n",wall_n)
+--print("w",wall_w)
+--print("sw",wall_sw)
+--print("e",wall_e)
+--print("se",wall_se)
+--print("bot",finish_line)
+--print("baLL",ball)
 
