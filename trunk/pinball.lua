@@ -6,9 +6,9 @@ category_all = category_world
 
 -- Position of camera
 camera_x = 0
-camera_y = 170--15--170
-camera_z = 200--30--200--200
-camera_turn_x = -45---45---2---45
+camera_y = 300--27--15--170
+camera_z = 0--30--200--200
+camera_turn_x = -90---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
 cam = true
@@ -16,10 +16,10 @@ cam = true
 -- Position of light
 light_x = 0.0
 light_y = 60.0
-light_z = 50.0
+light_z = 0.0--50.0
 
 -- Scaling constant (distance units per cm)
-scale = 1.43163923
+--scale = 1.43163923
 
 -- Ball attributes
 ball = nil
@@ -31,10 +31,10 @@ ball_erp = .2
 ball_cfm = 0.01
 
 -- Table attributes
-table_l = 139.7 * scale --27.5 in
-table_w = 68.58 * scale --55 in
+table_l = 200 --27.5 in
+table_w = 100 --55 in
 wall_h = ball_r * 2
-wall_th = 10
+wall_th = 5
 table_friction = 1000
 wall_bounce = 1
 wall_friction = 10
@@ -85,6 +85,13 @@ level = 1
 bumper_rgb = { { 0, 191/255, 1 }, { 124/255, 252/255, 0 }, { 1, 1, 0 }, { 1, 20/255, 147/255 } }
 dot_rgb = { { 1, 1, 0 }, { 1, 0, 0 } }
 all_dots_on_timer = 0
+
+plunger = nil
+plunger_force = 0
+max_plunger_force = 5000
+plunger_z = 0
+plunger_z_max = 15
+plunger_z_max_timer = 20
 
 
 ----- Helper functions
@@ -150,7 +157,7 @@ function init_table()
    E.turn_entity(wall_sw, 0, -35, 0)
    E.set_entity_geom_attr(wall_sw, E.geom_attr_callback, 3)
 
-   -- The south east wall
+   --[[ The south east wall
    wall_se = E.create_object("bin/box.obj")
    E.set_entity_position(wall_se, table_w/3+cos_theta*wall_th/2, wall_h/2, table_l/2-(sin_theta*wall_th/2 + cos_theta*cos_theta*table_w/3))
    E.set_entity_geom_type(wall_se, E.geom_type_box, (table_w/3)/cos_theta, wall_h*10, wall_th)
@@ -161,18 +168,103 @@ function init_table()
    current_h = maxy-miny
    current_th = maxz-minz
    E.set_entity_scale(wall_se, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
-   E.turn_entity(wall_se, 0, 35, 0)
-   
-	--FINISH LINE
+   E.turn_entity(wall_se, 0, 35, 0)]]
 
-	finish_line = E.create_object()
-    E.parent_entity(finish_line, pivot)
-    E.set_entity_geom_type(finish_line, E.geom_type_box, table_w, wall_th, wall_th)
-	E.set_entity_position(finish_line, 0, 0, table_l/2+wall_th/2)
+   --the dividing wall between the entry ramp and the playing area
+   local wall_div = E.create_object("bin/box.obj")
+   E.set_entity_position(wall_div, 35 + wall_th/2, wall_h/2, 20/2)
+   E.set_entity_geom_type(wall_div, E.geom_type_box, wall_th, wall_h*10, table_l-20)
+   E.parent_entity(wall_div, pivot)
+   E.set_mesh(wall_div, 0, brush)
+   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(wall_div)
+   current_h = maxy-miny
+   current_w = maxz-minz
+   current_th = maxx-minx
+   E.set_entity_scale(wall_div, wall_th/current_th, wall_h/current_h, (table_l-20)/current_w)
+   --E.set_entity_flags(wall_div, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(wall_div, E.entity_flag_wireframe, true)
+
+   --a wall at the bottom of the entry ramp
+   local wall_base = E.create_object("bin/box.obj")
+   E.set_entity_position(wall_base, 35 + wall_th + 5/2, wall_h/2, table_l/2-wall_th)
+   E.set_entity_geom_type(wall_base, E.geom_type_box, 15, wall_h*10, wall_th*2)
+   E.parent_entity(wall_base, pivot)
+   E.set_mesh(wall_base, 0, brush)
+   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(wall_base)
+   current_h = maxy-miny
+   current_w = maxz-minz
+   current_th = maxx-minx
+   E.set_entity_scale(wall_base, 15/current_th, wall_h/current_h, wall_th*2/current_w)
+    E.set_entity_geom_attr(object, E.geom_attr_bounce, 0)
+   
+
+   --a curve at the end of the ramp
+   local curve = E.create_object("bin/curve.obj")
+   E.set_entity_position(curve, 45.5, wall_h/2, -95.5)
+   --E.set_entity_geom_type(curve, E.geom_type_box, 10, wall_h*10, 10)
+   E.parent_entity(curve, pivot)
+   E.set_mesh(curve, 0, brush)
+   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(curve)
+   current_h = maxy-miny
+   current_w = maxz-minz
+   current_th = maxx-minx
+   E.set_entity_scale(curve, 15/current_th, wall_h/current_h, 15/current_w)
+   --E.set_entity_flags(curve, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(curve, E.entity_flag_wireframe, true)
+
+   --some geoms for the curve
+   local geom_curve_1 = E.create_object("bin/box.obj")
+   E.set_entity_position(geom_curve_1, 45.5+1.5, wall_h/2, -95.5-1.5)
+   E.set_entity_geom_type(geom_curve_1, E.geom_type_box, 10, wall_h*10, 5)
+   E.turn_entity(geom_curve_1, 0, -45, 0)
+   E.parent_entity(geom_curve_1, pivot)
+   --E.set_entity_flags(geom_curve_1, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(geom_curve_1, E.entity_flag_wireframe, true)
+   E.set_entity_flags(geom_curve_1, E.entity_flag_hidden, true)
+   local geom_curve_2 = E.create_object("bin/box.obj")
+   E.set_entity_position(geom_curve_2, 45.5-5, wall_h/2, -95.5-5)
+   E.set_entity_geom_type(geom_curve_2, E.geom_type_box, 10, wall_h*10, 5)
+   E.turn_entity(geom_curve_2, 0, -22.5, 0)
+   E.parent_entity(geom_curve_2, pivot)
+   --E.set_entity_flags(geom_curve_2, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(geom_curve_2, E.entity_flag_wireframe, true)
+   E.set_entity_flags(geom_curve_2, E.entity_flag_hidden, true)
+   local geom_curve_3 = E.create_object("bin/box.obj")
+   E.set_entity_position(geom_curve_3, 45.5+5.9, wall_h/2, -95.5+5)
+   E.set_entity_geom_type(geom_curve_3, E.geom_type_box, 10, wall_h*10, 5)
+   E.turn_entity(geom_curve_3, 0, -77.5, 0)
+   E.parent_entity(geom_curve_3, pivot)
+   --E.set_entity_flags(geom_curve_3, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(geom_curve_3, E.entity_flag_wireframe, true)
+   E.set_entity_flags(geom_curve_3, E.entity_flag_hidden, true)
+
+   -- A plunger
+   plunger = E.create_object("bin/plunger.obj")
+   E.set_entity_position(plunger, 35 + wall_th + 5/2, wall_h/2, table_l/2-wall_th)
+   --E.set_entity_position(plunger, 10, 10, 10)
+   --E.set_entity_geom_type(plunger, E.geom_type_box, 15, wall_h*10, wall_th*2)
+   E.parent_entity(plunger, pivot)
+   local plunger_brush = E.create_brush()
+   E.set_brush_color(plunger_brush, 1, 1, 1, 1)
+   E.set_mesh(plunger, 0, brush)
+   minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(plunger)
+   current_h = maxy-miny
+   current_w = maxz-minz
+   current_th = maxx-minx
+   --E.set_entity_geom_attr(plunger, E.geom_attr_mass, ball_m*2)
+   --E.add_entity_force(plunger, 0, 0, -1000)
+   --E.set_entity_scale(plunger, 15/current_th, wall_h/current_h, wall_th*2/current_w)
+
+   --[[finish line
+   finish_line = E.create_object()
+   E.parent_entity(finish_line, pivot)
+   E.set_entity_geom_type(finish_line, E.geom_type_box, table_w, wall_th, wall_th)
+   E.set_entity_position(finish_line, 0, 0, table_l/2+wall_th/2)
    --Allow ball to pass through the finish line
-    E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
+   E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
    E.set_entity_geom_attr(finish_line, E.geom_attr_bounce, wall_bounce)
-	E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
+   E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
+   ]]
 
    -- Add a flipper for testing
    local flipper = E.create_object("bin/flipper2.obj")
@@ -351,7 +443,7 @@ function add_ball()
                                   math.random(-180, 180))
     --table.insert(objects, object)
 
--- Make this a object which is under control of ode
+-- Make this an object which is under control of ode
     E.set_entity_body_type(object, true)
     
     local minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(object)
@@ -389,6 +481,14 @@ function add_ball()
     ball = object
 
     --return ball
+end
+
+function reset()
+   ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
+   ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
+   E.delete_entity(ball)
+   ball = nil
+   add_ball()
 end
 
 -- Flicks the flipper up if flick is true, otherwise it "unflicks" it
@@ -430,25 +530,24 @@ function apply_gravity()
 end
 
 function cameraChange()
-
-	if cam then
-	
-camera_x = 0
-camera_y = 300
-camera_z = 0
-camera_turn_x = -45  -- -90 from original
-    E.set_entity_position(camera, camera_x, camera_y, camera_z)
-	E.turn_entity(camera, camera_turn_x,0,0)
-	else
-camera_x = 0
-camera_y = 170
-camera_z = 200
-camera_turn_x = 45 -- -45 from original
-    E.set_entity_position(camera, camera_x, camera_y, camera_z)
-	E.turn_entity(camera, camera_turn_x,0,0)
-	end
-	cam = not cam
+   if cam then
+      camera_x = 0
+      camera_y = 300
+      camera_z = 0
+      camera_turn_x = -45  -- -90 from original
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x,0,0)
+   else
+      camera_x = 0
+      camera_y = 170
+      camera_z = 200
+      camera_turn_x = 45 -- -45 from original
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x,0,0)
+   end
+   cam = not cam
 end
+
 ---- Event functions
 -- timer (idle function)
 function do_timer(dt)
@@ -499,12 +598,35 @@ function do_timer(dt)
 	 for i,v in ipairs(dots) do
 	    local value = all_dots_on_timer/10
 	    local brush_num = 2 - ( ( (value - (value % 1) ) % 2))
-	    
-	    print(all_dots_on_timer)
-	    print(value)
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, dot_rgb[brush_num][1], dot_rgb[brush_num][2], dot_rgb[brush_num][3], 1)
 	    E.set_mesh(v[1], 1, brush)
+	 end
+      end
+   end
+   if plunger_force > 0 then
+      if plunger_force < max_plunger_force then
+	 plunger_force = plunger_force + 50
+      end
+   end
+   if plunger_z > 0 then
+      if plunger_z < plunger_z_max then
+	 if plunger_z_max_timer > 0 then
+	    local x, y, z = E.get_entity_position(plunger)
+	    E.set_entity_position(plunger, x, y, z-1)
+	    plunger_z = plunger_z + 1
+	 elseif plunger_z_max_timer == 0 then
+	    local x, y, z = E.get_entity_position(plunger)
+	    E.set_entity_position(plunger, x, y, z+1)
+	    plunger_z = plunger_z - 1
+	    if plunger_z == 0 then
+	       plunger_z_max_timer = 20
+	    end
+	 end
+      elseif plunger_z == plunger_z_max then
+	 plunger_z_max_timer = plunger_z_max_timer - 1
+	 if plunger_z_max_timer == 0 then
+	    plunger_z = plunger_z - 1
 	 end
       end
    end
@@ -526,6 +648,19 @@ function do_keyboard(key, down)
    elseif key == E.key_r and not down then --reset the pinball
       reset()
       return true
+   elseif key == E.key_space then
+      if down then --increase force of plunger
+	 plunger_force = 1000
+	 return false
+      else --release plunger
+	 local x, y, z = E.get_entity_position(ball)
+	 if x > 41.5 and x < 49.5 and z > 86 and z < 90 then
+	    E.add_entity_force(ball, 0, 0, -plunger_force)
+	    plunger_z = 1
+	 end
+	 plunger_force = 0
+	 return true
+      end
    elseif key == E.key_c and not down then --change the camera view
       cameraChange()
       return true
@@ -557,15 +692,6 @@ function do_keyboard(key, down)
    return false
 end
 
-function reset()
-   ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
-  ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
-   E.delete_entity(ball)
-   ball = nil
-   add_ball()
-	launch_count = launch_count + 1
-	print("reset ", launch_count)
-end
 -- mouse move
 function do_point(dX, dY)
    mouse_X = mouse_X + dX
