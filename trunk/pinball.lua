@@ -268,7 +268,6 @@ function init_table()
    E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
    ]]
 
-   add_flippers()
 
    add_circle_bumper(0,0)
    add_circle_bumper(8,-8)
@@ -914,7 +913,7 @@ function do_start()
     -- Tilt the table down
     --E.turn_entity(pivot, 0, 0, 10)
 
-       add_flippers() 
+    add_flippers()
     E.set_entity_joint_type(flipper_left, plane, E.joint_type_hinge)
     E.set_entity_joint_attr(flipper_left, plane, E.joint_attr_axis_1, 0, 1, 0)
    local anchorx, anchorz
