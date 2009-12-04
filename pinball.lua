@@ -418,7 +418,7 @@ function add_flippers()
    E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10*2, (maxz-minz)*(ball_r*2*2)/(maxy-miny))
 
 
-   E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
+   --E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
 
    --minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
@@ -457,7 +457,7 @@ function add_flippers()
    E.set_entity_geom_type(flipper2, E.geom_type_box, (maxx-minx)*(ball_r*2)/(maxy-miny), ball_r*10*2, (maxz-minz)*(ball_r*2* 2)/(maxy-miny))
 
 
-   E.set_entity_scale(flipper2, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
+   --E.set_entity_scale(flipper2, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
 
    --minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
    --print(minx, miny, minz, maxx, maxy, maxz)
