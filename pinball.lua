@@ -13,7 +13,7 @@ camera_z = 200--30--200--200
 camera_turn_x = -45---45---2---45
 camera_turn_y = 0 --not used
 camera_turn_z = 0 --not used
-cam = true
+camera_num = 6
 
 -- Position of light
 light_x = 0.0
@@ -95,8 +95,6 @@ plunger_z = 0
 plunger_z_max = 15
 plunger_z_max_timer = 20
 
-camera_num = 0
-
 balls_left = 3
 ball_gone = false
 ball_gone_timer = 50
@@ -112,7 +110,7 @@ function init_table()
    E.set_brush_color(brush, wall_r, wall_g, wall_b, 1)
 
    --The west wall
-   wall_west = E.create_object("bin/box.obj")
+   local wall_west = E.create_object("bin/box.obj")
    E.set_entity_position(wall_west, -table_w/2 - wall_th/2, wall_h/2, -wall_th/2)
    E.set_entity_geom_type(wall_west, E.geom_type_box, wall_th, wall_h*10, table_l+wall_th)
    E.parent_entity(wall_west, pivot)
@@ -124,7 +122,7 @@ function init_table()
    E.set_entity_scale(wall_west, wall_th/current_th, wall_h/current_h, (table_l+wall_th)/current_w)
    
    -- The east wall
-   wall_east = E.create_object("bin/box.obj")
+   local wall_east = E.create_object("bin/box.obj")
    E.set_entity_position(wall_east, table_w/2 + wall_th/2, wall_h/2, -wall_th/2)
    E.set_entity_geom_type(wall_east, E.geom_type_box, wall_th, wall_h*10, table_l+wall_th)
    E.parent_entity(wall_east, pivot)
@@ -136,7 +134,7 @@ function init_table()
    E.set_entity_scale(wall_east, wall_th/current_th, wall_h/current_h, (table_l+wall_th)/current_w)
 
    -- The north wall
-   wall_north = E.create_object("bin/box.obj")
+   local wall_north = E.create_object("bin/box.obj")
    E.set_entity_position(wall_north, 0.0, wall_h/2, -table_l/2-wall_th/2)
    E.set_entity_geom_type(wall_north, E.geom_type_box, table_w, wall_h*10, wall_th)
    E.parent_entity(wall_north, pivot)
@@ -152,29 +150,30 @@ function init_table()
    local sin_theta = math.sin(theta*math.pi/180)
 
    -- The south west wall
-   wall_sw = E.create_object("bin/box.obj")
-   E.set_entity_position(wall_sw, -table_w/3-cos_theta*wall_th/2+1, wall_h/2-0.01, table_l/2-(sin_theta*wall_th/2 + cos_theta*cos_theta*table_w/3))
-   E.set_entity_geom_type(wall_sw, E.geom_type_box, (table_w/3)/cos_theta, wall_h*10, wall_th)
+   local wall_sw = E.create_object("bin/box.obj")
+   E.set_entity_position(wall_sw, -35, wall_h/2-0.01, 78)
+   E.set_entity_geom_type(wall_sw, E.geom_type_box, 45.14045, wall_h*10, wall_th)
    E.parent_entity(wall_sw, pivot)
    E.set_mesh(wall_sw, 0, brush)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(wall_sw)
    current_l = maxx-minx
    current_h = maxy-miny
    current_th = maxz-minz
-   E.set_entity_scale(wall_sw, ((table_w/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
+   E.set_entity_scale(wall_sw, 45.14045/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_sw, 0, -35, 0)
+   --E.set_entity_flags(wall_sw, E.entity_flag_hidden, true)
 
    -- The south east wall
-   wall_se = E.create_object("bin/box.obj")
-   E.set_entity_position(wall_se, 40*2/3+cos_theta*wall_th/2+0.5, wall_h/2-0.01, table_l/2-(sin_theta*wall_th/2 + cos_theta*cos_theta*40*2/3))
-   E.set_entity_geom_type(wall_se, E.geom_type_box, (40/3)/cos_theta, wall_h*10, wall_th)
+   local wall_se = E.create_object("bin/box.obj")
+   E.set_entity_position(wall_se, 27.5, wall_h/2-0.01, 84)
+   E.set_entity_geom_type(wall_se, E.geom_type_box, 25, wall_h*10, wall_th)
    E.parent_entity(wall_se, pivot)
    E.set_mesh(wall_se, 0, brush)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(wall_se)
    current_l = maxx-minx
    current_h = maxy-miny
    current_th = maxz-minz
-   E.set_entity_scale(wall_se, ((40/3)/cos_theta)/current_l, wall_h/current_h, wall_th/current_th)
+   E.set_entity_scale(wall_se, 25/current_l, wall_h/current_h, wall_th/current_th)
    E.turn_entity(wall_se, 0, 35, 0)
 
    --the dividing wall between the entry ramp and the playing area
@@ -192,7 +191,7 @@ function init_table()
    --E.set_entity_flags(wall_div, E.entity_flag_wireframe, true)
 
    --a wall at the bottom of the entry ramp
-   local wall_base = E.create_object("bin/box.obj")
+   wall_base = E.create_object("bin/box.obj")
    E.set_entity_position(wall_base, 35 + wall_th + 5/2, wall_h/2, table_l/2-wall_th)
    E.set_entity_geom_type(wall_base, E.geom_type_box, 15, wall_h*10, wall_th*2)
    E.parent_entity(wall_base, pivot)
@@ -202,7 +201,7 @@ function init_table()
    current_w = maxz-minz
    current_th = maxx-minx
    E.set_entity_scale(wall_base, 15/current_th, wall_h/current_h, wall_th*2/current_w)
-    E.set_entity_geom_attr(object, E.geom_attr_bounce, 0)
+   E.set_entity_geom_attr(object, E.geom_attr_bounce, 0)
    
 
    --a curve at the end of the ramp
@@ -280,13 +279,22 @@ function init_table()
 
 
    add_circle_bumper(0,0)
-   add_circle_bumper(8,-8)
-   add_circle_bumper(-8,-8)
+   add_circle_bumper(12,12)
+   add_circle_bumper(-12,12)
+   add_circle_bumper(-12,-12)
+   add_circle_bumper(12,-12)
 
-   add_dot(-20, -20)
-   add_dot(-20, 20)
-   add_dot(20, 20)
-   add_dot(20, -20)
+   add_circle_bumper(-24,-74)
+   add_circle_bumper(-16,-66)
+   add_circle_bumper(-8,-58)
+   add_circle_bumper(0,-50)
+   add_circle_bumper(8,-42)
+--   add_circle_bumper(,0)
+
+   add_dot(-24, -24)
+   add_dot(-24, 24)
+   add_dot(24, 24)
+   add_dot(24, -24)
    --add_dot(-10, -10)
    --add_dot(-10, 10)
    --add_dot(10, 10)
@@ -421,14 +429,14 @@ end
 --only for the left flipper currently
 function add_flippers()
 
--- Add a flipper for testing
+   -- the first flipper
    local flipper = E.create_object("bin/flipper2.obj")
 
    E.parent_entity(flipper, pivot)
 
    E.set_entity_body_type(flipper, true)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper)
-   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/(1.7*(maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2*2)/(2*(maxy-miny)))
+   E.set_entity_geom_type(flipper, E.geom_type_box, (maxx-minx)*(ball_r*2)/((maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2*2)/(2*(maxy-miny)))
 
 
    --E.set_entity_scale(flipper, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
@@ -445,7 +453,7 @@ function add_flippers()
    E.set_entity_geom_attr(flipper, E.geom_attr_category, category_flipper)
    E.set_entity_geom_attr(flipper, E.geom_attr_collider, category_ball)
 
-   E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
+   --E.set_entity_flags(flipper, E.entity_flag_wireframe, true)
    E.set_entity_geom_attr(flipper, E.geom_attr_mass, 1)
    E.set_entity_geom_attr(flipper, E.geom_attr_callback, 0)
    E.set_entity_geom_attr(flipper, E.geom_attr_bounce, wall_bounce)
@@ -457,17 +465,17 @@ function add_flippers()
 
    flipper_left = flipper
    --E.set_entity_scale(flipper, 3, 3, 3)
-   E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(flipper, E.entity_flag_visible_geom, true)
 
 
--- Add a flipper for testing
+   -- the second flipper
    local flipper2 = E.create_object("bin/flipper2.obj")
 
    E.parent_entity(flipper2, pivot)
 
    E.set_entity_body_type(flipper2, true)
    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(flipper2)
-   E.set_entity_geom_type(flipper2, E.geom_type_box, (maxx-minx)*(ball_r*2)/(1.7*(maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2* 2)/(2*(maxy-miny)))
+   E.set_entity_geom_type(flipper2, E.geom_type_box, (maxx-minx)*(ball_r*2)/((maxy-miny)), ball_r*10, (maxz-minz)*(ball_r*2* 2)/(2*(maxy-miny)))
 
 
    --E.set_entity_scale(flipper2, (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny), (ball_r*2)/(maxy-miny))
@@ -484,7 +492,7 @@ function add_flippers()
    E.set_entity_geom_attr(flipper2, E.geom_attr_category, category_flipper)
    E.set_entity_geom_attr(flipper2, E.geom_attr_collider, category_ball)
 
-   E.set_entity_flags(flipper2, E.entity_flag_wireframe, true)
+   --E.set_entity_flags(flipper2, E.entity_flag_wireframe, true)
    E.set_entity_geom_attr(flipper2, E.geom_attr_mass, 1)
    E.set_entity_geom_attr(flipper2, E.geom_attr_callback, 0)
    E.set_entity_geom_attr(flipper2, E.geom_attr_bounce, wall_bounce)
@@ -496,7 +504,7 @@ function add_flippers()
 
    flipper_right = flipper2
    --E.set_entity_scale(flipper, 3, 3, 3)
-   E.set_entity_flags(flipper2, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(flipper2, E.entity_flag_visible_geom, true)
 end
 
 -- Add a ball
@@ -510,7 +518,7 @@ function add_ball()
     E.set_brush_flags(E.get_mesh(object, 2), E.brush_flag_env_map_1, true)
 
     math.randomseed(os.clock())
-    ball_i_x = math.random(44, 46)
+    ball_i_x = math.random(46, 48)
     ball_i_z = 85
     E.set_entity_position(object, ball_i_x, ball_i_y, ball_i_z)
 
@@ -566,24 +574,23 @@ function begin()
 end
 
 function turn_over()
-   if balls_left > 1 then
-      reset()
-      return true
-   else
+   if balls_left <= 1 then
+      --reset()
+      --return true
       --end game
-      print("Game Over")
+      print("\n\nGame Over")
       E.exit()
+   else
+      ball_gone = true
+      E.delete_entity(ball)
+      balls_left = balls_left - 1
+      ball = nil
    end
 end
 
-function reset()
-   --ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
-   --ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
-   E.delete_entity(ball)
-   balls_left = balls_left - 1
-   ball = nil
+--[[function reset()
    add_ball()
-end
+end--]]
 
 -- Flicks the flipper up if flick is true, otherwise it "unflicks" it
 function flick_flipper(num, flick)
@@ -715,6 +722,15 @@ function do_timer(dt)
 	 turn_over()
       end
    end
+   if ball_gone then
+      if ball_gone_timer <= 0 then
+	 ball_gone_timer = 50
+	 ball_gone = false
+	 add_ball()
+      else
+	 ball_gone_timer = ball_gone_timer - 1
+      end
+   end
    for i,v in ipairs(bumpers) do
       if v[3] >= 1 then
 	 if v[7] >= 1 then
@@ -827,11 +843,12 @@ function do_keyboard(key, down)
       --return true
    elseif key == E.key_space then
       if down then --increase force of plunger
-	 plunger_force = 1000
+	 math.randomseed(os.clock())
+	 plunger_force = math.random(750, 1100)
 	 return false
       else --release plunger
 	 local x, y, z = E.get_entity_position(ball)
-	 if x > 40.5 and x < 49.5 and z > 86 and z < 90 then
+	 if x > 40.5 and x < 49.5 and z > 82 and z < 90 then
 	    E.add_entity_force(ball, 0, 0, -plunger_force)
 	    plunger_z = 1
 	 end
@@ -900,14 +917,9 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 
 	
    if ball == entityA or ball == entityB then
-      --if not (plane == entityA or plane == entityB) then
-         --print("ball contact")
-	 --print(entityB == roof)
-      --end
-      --Ball crossed finish line
-      --if finish_line == entityB or finish_line == entityA then
-	 --reset()
-      --end
+      if (wall_base == entityA or wall_base == entityB) then
+	 E.add_entity_force(ball, 0, 0, 500)
+      end
       --Ball hit angled bumper
       if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
 	 --print("Boing!!!")
@@ -1024,9 +1036,8 @@ function do_start()
     add_flippers()
     E.set_entity_joint_type(flipper_left, plane, E.joint_type_hinge)
     E.set_entity_joint_attr(flipper_left, plane, E.joint_attr_axis_1, 0, 1, 0)
-    local anchorx, anchorz
-    anchorx = -9.6 - ((maxx-minx)/2)*math.sin(60*math.pi/180) - 2
-    anchorz = 93.9 - ((maxz-minz)/2)*math.cos(60*math.pi/180)
+    local anchorx = -15.95
+    local anchorz = 89.75
     E.set_entity_joint_attr(flipper_left, plane, E.joint_attr_anchor, anchorx, ball_r*1.5, anchorz)
     E.set_entity_joint_attr(flipper_left, plane, E.joint_attr_lo_stop, -15)
     E.set_entity_joint_attr(flipper_left, plane, E.joint_attr_hi_stop, 120)
@@ -1034,8 +1045,8 @@ function do_start()
     E.set_entity_joint_type(flipper_right, plane, E.joint_type_hinge)
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_axis_1, 0, 1, 0)
     local anchorx2, anchorz2
-    anchorx2 = 9.6 + ((maxx-minx)/2)*math.sin(60*math.pi/180) + 2
-    anchorz2 = 93.9 - ((maxz-minz)/2)*math.cos(60*math.pi/180)
+    anchorx2 = 15.95
+    anchorz2 = 89.75
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_anchor, anchorx2, ball_r *1.5, anchorz2)
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_hi_stop, 15)
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_lo_stop, -120)
@@ -1044,8 +1055,8 @@ function do_start()
     E.print_console("Type F1 to toggle this console.\n")
     E.print_console("Type F2 to toggle full-screen.\n")
     E.print_console("Type escape to exit this program.\n")
-    E.print_console("Type 'r' to reset the ball.\n")
-    E.print_console("Type 'c' to change the camera view.\n")
+    E.print_console("Type 'L' to flick the left flipper.\n")
+    E.print_console("Type 'R' to flick the right flipper.\n")
 
     E.enable_timer(true)
     --E.set_sound_receiver(camera, 400)
