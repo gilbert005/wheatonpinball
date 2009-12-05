@@ -42,9 +42,9 @@ wall_bounce = 1
 wall_friction = 10
 
 -- Initial position of the ball
-ball_i_x = math.random(-table_w/2+ball_r, table_w/2-ball_r)
+ball_i_x = 0
 ball_i_y = 0.83457559347153 --* ball_r / 1.5
-ball_i_z = math.random(-table_l/2-ball_r, 0)
+ball_i_z = 0
 
 -- Position of the mouse
 mouse_X = 0
@@ -220,30 +220,30 @@ function init_table()
    --E.set_entity_flags(curve, E.entity_flag_wireframe, true)
 
    --some geoms for the curve
-   local geom_curve_1 = E.create_object("bin/box.obj")
+   local geom_curve_1 = E.create_object()
    E.set_entity_position(geom_curve_1, 45.5+1.5, wall_h/2, -95.5-1.5)
    E.set_entity_geom_type(geom_curve_1, E.geom_type_box, 10, wall_h*10, 5)
    E.turn_entity(geom_curve_1, 0, -45, 0)
    E.parent_entity(geom_curve_1, pivot)
    --E.set_entity_flags(geom_curve_1, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(geom_curve_1, E.entity_flag_wireframe, true)
-   E.set_entity_flags(geom_curve_1, E.entity_flag_hidden, true)
-   local geom_curve_2 = E.create_object("bin/box.obj")
+   --E.set_entity_flags(geom_curve_1, E.entity_flag_hidden, true)
+   local geom_curve_2 = E.create_object()
    E.set_entity_position(geom_curve_2, 45.5-5, wall_h/2, -95.5-5)
    E.set_entity_geom_type(geom_curve_2, E.geom_type_box, 10, wall_h*10, 5)
    E.turn_entity(geom_curve_2, 0, -22.5, 0)
    E.parent_entity(geom_curve_2, pivot)
    --E.set_entity_flags(geom_curve_2, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(geom_curve_2, E.entity_flag_wireframe, true)
-   E.set_entity_flags(geom_curve_2, E.entity_flag_hidden, true)
-   local geom_curve_3 = E.create_object("bin/box.obj")
+   --E.set_entity_flags(geom_curve_2, E.entity_flag_hidden, true)
+   local geom_curve_3 = E.create_object()
    E.set_entity_position(geom_curve_3, 45.5+5.9, wall_h/2, -95.5+5)
    E.set_entity_geom_type(geom_curve_3, E.geom_type_box, 10, wall_h*10, 5)
    E.turn_entity(geom_curve_3, 0, -77.5, 0)
    E.parent_entity(geom_curve_3, pivot)
    --E.set_entity_flags(geom_curve_3, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(geom_curve_3, E.entity_flag_wireframe, true)
-   E.set_entity_flags(geom_curve_3, E.entity_flag_hidden, true)
+   --E.set_entity_flags(geom_curve_3, E.entity_flag_hidden, true)
 
    -- A plunger
    plunger = E.create_object("bin/plunger.obj")
@@ -259,21 +259,23 @@ function init_table()
    E.set_entity_scale(plunger, 1, wall_h/current_h, 1)
 
    -- A roof
-   local roof = E.create_object("bin/box.obj")
+   local roof = E.create_object()
    E.set_entity_position(roof, 0, ball_r*2+0.1+20, 0)
    E.set_entity_geom_type(roof, E.geom_type_box, 200, 40, 400)
    E.parent_entity(roof, pivot)
-   E.set_entity_flags(roof, E.entity_flag_hidden, true)
+   --E.set_entity_flags(roof, E.entity_flag_hidden, true)
 
-   --finish line
-   finish_line = E.create_object()
+   --[[finish line
+   local finish_line = E.create_object()
    E.parent_entity(finish_line, pivot)
-   E.set_entity_geom_type(finish_line, E.geom_type_box, table_w, wall_th, wall_th)
-   E.set_entity_position(finish_line, 0, 0, table_l/2+wall_th/2)
+   E.set_entity_geom_type(finish_line, E.geom_type_plane, 0, 0, 1, table_l/2)
+   --E.set_entity_position(finish_line, 0, 0, table_l/2+wall_th/2)
    --Allow ball to pass through the finish line
-   E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
-   E.set_entity_geom_attr(finish_line, E.geom_attr_bounce, wall_bounce)
+   --E.set_entity_geom_attr(finish_line, E.geom_attr_soft_cfm, 1.0)
+   --E.set_entity_geom_attr(finish_line, E.geom_attr_bounce, wall_bounce)
+   E.set_entity_flags(finish_line, E.entity_flag_wireframe, true)
    E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
+   --E.set_entity_flags(finish_line, E.entity_flag_hidden, true)]]
    
 
 
@@ -321,9 +323,11 @@ function init_table()
    E.set_entity_geom_attr(wall_sw, E.geom_attr_category, 2)
    E.set_entity_geom_attr(wall_se, E.geom_attr_category, 2)
    E.set_entity_geom_attr(roof, E.geom_attr_category, category_world)
+   --E.set_entity_geom_attr(finish_line, E.geom_attr_category, 16)
    E.set_entity_geom_attr(wall_sw, E.geom_attr_collider, category_ball)
    E.set_entity_geom_attr(wall_se, E.geom_attr_collider, category_ball)
    E.set_entity_geom_attr(roof, E.geom_attr_collider, category_ball)
+   --E.set_entity_geom_attr(finish_line, E.geom_attr_collider, category_world)
    --E.set_entity_flags(wall_west, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(wall_east, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(wall_north, E.entity_flag_visible_geom, true)
@@ -361,7 +365,7 @@ function add_circle_bumper(x, z)
    --E.set_entity_flags(bumper_circle, E.entity_flag_wireframe, true)
    --E.set_entity_geom_attr(bumper_circle, E.geom_attr_callback, 0)
 
-   local bumper_circle_geom = E.create_object("bin/circle_bumper.obj")
+   local bumper_circle_geom = E.create_object()
    E.parent_entity(bumper_circle_geom, pivot)
    --E.set_entity_scale(bumper_circle_geom, 2, 2, 2)
    E.set_entity_geom_type(bumper_circle_geom, E.geom_type_capsule, ball_r*1.55, ball_r*2)
@@ -372,7 +376,7 @@ function add_circle_bumper(x, z)
    E.set_entity_position(bumper_circle_geom, x, ball_r, z)
    --E.set_entity_scale(bumper_circle_geom, 2*ball_r*2/current_d, 2*ball_r*2/current_h, 2*ball_r*2/current_d)
    --E.set_entity_flags(bumper_circle_geom, E.entity_flag_visible_geom, true)
-   E.set_entity_flags(bumper_circle_geom, E.entity_flag_hidden, true)
+   --E.set_entity_flags(bumper_circle_geom, E.entity_flag_hidden, true)
    --E.set_entity_geom_attr(bumper_circle_geom, E.geom_attr_callback, 3)
 
    --The bumpers array holds an array for each bumper, each having:
@@ -505,11 +509,14 @@ function add_ball()
     E.set_brush_image(E.get_mesh(object, 2), envmap, 1)
     E.set_brush_flags(E.get_mesh(object, 2), E.brush_flag_env_map_1, true)
 
+    math.randomseed(os.clock())
+    ball_i_x = math.random(44, 46)
+    ball_i_z = 85
     E.set_entity_position(object, ball_i_x, ball_i_y, ball_i_z)
 
-    E.set_entity_rotation(object, math.random(-180, 180),
-                                  math.random(-180, 180),
-                                  math.random(-180, 180))
+    --E.set_entity_rotation(object, math.random(-180, 180),
+                                  --math.random(-180, 180),
+                                  --math.random(-180, 180))
     --table.insert(objects, object)
 
 -- Make this an object which is under control of ode
@@ -549,16 +556,31 @@ function add_ball()
 
     ball = object
 
-    --return ball
+    return ball
+end
+
+function begin()
+   balls_left = 3
+   add_ball()
+   return true
+end
+
+function turn_over()
+   if balls_left > 1 then
+      reset()
+      return true
+   else
+      --end game
+      print("Game Over")
+      E.exit()
+   end
 end
 
 function reset()
    --ball_i_x = math.random(10*(-table_w/2+ball_r), 10*(table_w/2-ball_r))/10
    --ball_i_z = math.random(10*(-table_l/2+ball_r), 0)/10
-   math.randomseed(os.clock())
-   ball_i_x = math.random(44, 46)
-   ball_i_z = 85
    E.delete_entity(ball)
+   balls_left = balls_left - 1
    ball = nil
    add_ball()
 end
@@ -604,7 +626,7 @@ function apply_gravity()
 end
 
 function set_camera()
-   if camera_num > 1 or camera_num < 0 then
+   if camera_num > 7 or camera_num < 0 then
       camera_num = 0
    end
    if camera_num == 0 then
@@ -625,17 +647,74 @@ function set_camera()
       E.set_entity_position(camera, camera_x, camera_y, camera_z)
       E.turn_entity(camera, camera_turn_x, 0, 0)
       camera_turn_x = camera_angle_x
-   --elseif camera_num == 2 then
-   --elseif camera_num == 3 then
-   --elseif camera_num == 4 then
-   else
+   elseif camera_num == 2 then
+      camera_x = 35
+      camera_y = 60
+      camera_z = 85
+      camera_angle_x = -90
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
+   elseif camera_num == 3 then
+      camera_x = 35
+      camera_y = 60
+      camera_z = -85
+      camera_angle_x = -90
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
+   elseif camera_num == 4 then
+      camera_x = 0
+      camera_y = 75
+      camera_z = 0
+      camera_angle_x = -90
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
+   elseif camera_num == 5 then
+      camera_x = 0
+      camera_y = 50
+      camera_z = 50
+      camera_angle_x = -45
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
+   elseif camera_num == 6 then
+      camera_x = 0
+      camera_y = 70
+      camera_z = 140
+      camera_angle_x = -45
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
+   elseif camera_num == 7 then
+      camera_x = 0
+      camera_y = 90
+      camera_z = 80
+      camera_angle_x = -90
+      camera_turn_x = camera_angle_x - camera_turn_x
+      E.set_entity_position(camera, camera_x, camera_y, camera_z)
+      E.turn_entity(camera, camera_turn_x, 0, 0)
+      camera_turn_x = camera_angle_x
    end
+   return true
 end
 
 ---- Event functions
 -- timer (idle function)
 function do_timer(dt)
    toReturn = false
+   if not (ball == nil) then
+      local x, y, z = E.get_entity_position(ball)
+      if x>55 or x<-55 or y>4 or y<0 or z>105 or z<-105 then
+	 turn_over()
+      end
+   end
    for i,v in ipairs(bumpers) do
       if v[3] >= 1 then
 	 if v[7] >= 1 then
@@ -743,9 +822,9 @@ function do_keyboard(key, down)
    elseif key == E.key_left then
       flick_flipper(flipper_left_id, down)
       return true
-   elseif key == E.key_r and not down then --reset the pinball
-      reset()
-      return true
+   --elseif key == E.key_r and not down then --reset the pinball
+      --reset()
+      --return true
    elseif key == E.key_space then
       if down then --increase force of plunger
 	 plunger_force = 1000
@@ -819,26 +898,31 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	--print("bCat, aCall", E.get_entity_geom_attr(entityB, E.geom_attr_category),E.get_entity_geom_attr(entityA, E.geom_attr_callback))
 	--end
 
-	--Ball crossed finish line
-	if finish_line == entityB or finish_line == entityA then
-		reset()
-	end
-	--Ball hit angled bumper
-   if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
-		print("Boing!!!")
-      local bumpsound = E.load_sound("bin/boing.ogg")
-      --E.set_sound_emitter(bumpsound, ball)
-      E.play_sound(bumpsound)
-	--E.free_sound(bumpsound)
-   end
+	
    if ball == entityA or ball == entityB then
+      --if not (plane == entityA or plane == entityB) then
+         --print("ball contact")
+	 --print(entityB == roof)
+      --end
+      --Ball crossed finish line
+      --if finish_line == entityB or finish_line == entityA then
+	 --reset()
+      --end
+      --Ball hit angled bumper
+      if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
+	 --print("Boing!!!")
+	 local bumpsound = E.load_sound("bin/boing.ogg")
+	 --E.set_sound_emitter(bumpsound, ball)
+	 E.play_sound(bumpsound)
+	 --E.free_sound(bumpsound)
+      end
       for i,v in ipairs(bumpers) do
-		--Ball hit peg
+	 --Ball hit peg
 	 if v[1] == entityB or v[1] == entityA then
 	    local bumpsound = E.load_sound("bin/KirbyStyleLaser.ogg")
 	    --E.set_sound_emitter(bumpsound, ball)
 	    E.play_sound(bumpsound)
-		--E.free_sound(bumpsound)
+	    --E.free_sound(bumpsound)
 	    E.add_entity_force(ball, 400*nx, 0, 400*nz)
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, 1, 0, 0, 1)
@@ -852,9 +936,9 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	    return true
 	 end
       end
-
+      
       for i,v in ipairs(dots) do
-		--Ball passed over dot
+	 --Ball passed over dot
 	 if v[1] == entityB or v[1] == entityA then
 	    local brush = E.create_brush()
 	    E.set_brush_color(brush, dot_rgb[2][1], dot_rgb[2][2], dot_rgb[2][3], 1)
@@ -972,4 +1056,5 @@ end
 
 do_start()
 init_table()
-add_ball()
+--add_ball()
+begin()
