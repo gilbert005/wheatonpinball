@@ -8,17 +8,17 @@ category_all = category_world + category_ball + category_flipper
 
 -- Position of camera
 camera_x = 0
-camera_y = 170--27--15--170
+camera_y = 200--27--15--170
 camera_z = 200--30--200--200
 camera_turn_x = -45---45---2---45
-camera_turn_y = 0 --not used
-camera_turn_z = 0 --not used
+camera_turn_y = 0--180
+camera_turn_z = 0
 camera_num = 6
 
 -- Position of light
 light_x = 0.0
 light_y = 60.0
-light_z = 0.0--50.0
+light_z = -90.0
 
 -- Scaling constant (distance units per cm)
 --scale = 1.43163923
@@ -78,6 +78,7 @@ bumpers = { }
 dots = { }
 
 -- A variable for the score
+score_str = nil
 score = 0
 bumper_score = 150
 dot_score = 50
@@ -276,6 +277,19 @@ function init_table()
    E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(finish_line, E.entity_flag_hidden, true)]]
    
+	--The Scoreboard
+	scoreboard_img = E.create_image("bin/pinball.jpg")
+	scoreboard_brush = E.create_brush()
+	E.set_brush_image(scoreboard_brush, scoreboard_img)
+	E.set_brush_flags(scoreboard_brush, E.brush_flag_unlit, true)
+	scoreboard = E.create_sprite(scoreboard_brush)
+	E.parent_entity(scoreboard, pivot)
+	E.set_entity_flags(scoreboard, E.entity_flag_billboard, true)
+	local score_x, score_y = E.get_image_size(scoreboard_img)
+	local table_x = table_w + wall_th
+	E.set_entity_scale(scoreboard, table_x/score_x, table_x/score_x, table_x/score_x)
+	local scale_x, scale_y, scale_z = E.get_entity_scale(scoreboard)
+	E.set_entity_position(scoreboard, 0, score_y*scale_y/2,-table_l/2-wall_th-10)
 
 
    add_circle_bumper(0,0)
@@ -715,6 +729,7 @@ end
 ---- Event functions
 -- timer (idle function)
 function do_timer(dt)
+	E.set_string_text(score_str, score)
    toReturn = false
    if not (ball == nil) then
       local x, y, z = E.get_entity_position(ball)
@@ -834,6 +849,10 @@ end
 function do_keyboard(key, down)
    if key == E.key_right then
       flick_flipper(flipper_right_id, down)
+      return true
+	end
+   if key == E.key_l then
+      E.turn_entity(camera, 0, 10, 0)
       return true
    elseif key == E.key_left then
       flick_flipper(flipper_left_id, down)
@@ -984,7 +1003,7 @@ function do_start()
     camera = E.create_camera(E.camera_type_perspective)
     E.set_entity_position(camera, camera_x, camera_y, camera_z)
     --E.turn_entity(camera, 0, camera_turn_y, 0)
-    E.turn_entity(camera, camera_turn_x, 0, 0)
+    E.turn_entity(camera, camera_turn_x, camera_turn_y, camera_turn_z)
    
     -- Set up light
     light = E.create_light(E.light_type_positional)
@@ -1052,16 +1071,17 @@ function do_start()
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_lo_stop, -120)
     
     -- tell user how to toggle console and exit
-    E.print_console("Type F1 to toggle this console.\n")
+    --[[E.print_console("Type F1 to toggle this console.\n")
     E.print_console("Type F2 to toggle full-screen.\n")
     E.print_console("Type escape to exit this program.\n")
-    E.print_console("Type 'L' to flick the left flipper.\n")
-    E.print_console("Type 'R' to flick the right flipper.\n")
-
+    E.print_console("Type 'Left arrow' to flick the left flipper.\n")
+    E.print_console("Type 'Right arrow' to flick the right flipper.\n")
+]]
     E.enable_timer(true)
     --E.set_sound_receiver(camera, 400)
     --E.set_entity_flags(camera, E.entity_flag_wireframe, true)
     E.set_typeface("bin/Adventure_Subtitles_Normal.ttf")
+	score_str = E.create_string(score)
 
 end
 
