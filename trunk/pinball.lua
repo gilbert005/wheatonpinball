@@ -98,6 +98,8 @@ plunger_z_max = 15
 plunger_z_max_timer = 20
 
 balls_left = 3
+old_balls = nil
+balls_str = nil
 ball_gone = false
 ball_gone_timer = 50
 
@@ -152,7 +154,7 @@ function init_table()
    local sin_theta = math.sin(theta*math.pi/180)
 
    -- The south west wall
-   local wall_sw = E.create_object("bin/box.obj")
+   wall_sw = E.create_object("bin/box.obj")
    E.set_entity_position(wall_sw, -35, wall_h/2-0.01, 78)
    E.set_entity_geom_type(wall_sw, E.geom_type_box, 45.14045, wall_h*10, wall_th)
    E.parent_entity(wall_sw, pivot)
@@ -166,7 +168,7 @@ function init_table()
    --E.set_entity_flags(wall_sw, E.entity_flag_hidden, true)
 
    -- The south east wall
-   local wall_se = E.create_object("bin/box.obj")
+   wall_se = E.create_object("bin/box.obj")
    E.set_entity_position(wall_se, 27.5, wall_h/2-0.01, 84)
    E.set_entity_geom_type(wall_se, E.geom_type_box, 25, wall_h*10, wall_th)
    E.parent_entity(wall_se, pivot)
@@ -291,6 +293,29 @@ function init_table()
    E.set_entity_scale(scoreboard, table_x/score_x, table_x/score_x, table_x/score_x)
    local scale_x, scale_y, scale_z = E.get_entity_scale(scoreboard)
    E.set_entity_position(scoreboard, 0, score_y*scale_y/2,-table_l/2-wall_th-10)
+
+    score_str = E.create_string(score)
+    E.parent_entity(score_str, scoreboard)
+    brush_str = E.create_brush()
+    E.set_brush_color(brush_str, 0, 0, 0, 1)
+    E.set_string_line(score_str, brush_str)
+    E.set_string_fill(score_str, brush_str)
+    E.set_entity_position(score_str, -70, 55, 1)
+    E.set_entity_scale(score_str, 35, 35, 35)
+    --E.turn_entity(score_str, 0, 180, 0)
+    
+    --local x,y,z = E.get_entity_position(score_str)
+    --minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(score_str)
+    --print(minx, miny, minz, maxx, maxy, maxz)
+    --print(x,y,z)
+
+	balls_str = E.create_string("BALL " .. balls_left)
+    E.set_string_line(balls_str, brush_str)
+    E.set_string_fill(balls_str, brush_str)
+	E.parent_entity(balls_str, scoreboard)
+	E.set_entity_position(balls_str, 100, 52, 1)
+	E.set_entity_scale(balls_str, 35,30,25)
+
    
    
    add_circle_bumper(0,0)
@@ -354,8 +379,10 @@ function init_table()
    E.set_entity_geom_attr(wall_sw, E.geom_attr_friction, wall_friction)
    E.set_entity_geom_attr(wall_se, E.geom_attr_friction, wall_friction)
 
-   E.set_entity_geom_attr(wall_sw, E.geom_attr_category, 2)
-   E.set_entity_geom_attr(wall_se, E.geom_attr_category, 2)
+   --E.set_entity_geom_attr(wall_sw, E.geom_attr_category, 3)
+   --E.set_entity_geom_attr(wall_se, E.geom_attr_category, 3)
+   --E.set_entity_geom_attr(wall_sw, E.geom_attr_callback, 2)
+   --E.set_entity_geom_attr(wall_se, E.geom_attr_callback, 2)
    E.set_entity_geom_attr(roof, E.geom_attr_category, category_world)
    --E.set_entity_geom_attr(finish_line, E.geom_attr_category, 16)
    E.set_entity_geom_attr(wall_sw, E.geom_attr_collider, category_ball)
@@ -605,10 +632,10 @@ function turn_over()
       --return true
       --end game
       print("\n\nGame Over")
+      print("Your score: " .. score)
       E.exit()
    else
       ball_gone = true
-      E.delete_entity(ball)
       balls_left = balls_left - 1
       ball = nil
    end
@@ -750,6 +777,11 @@ function do_timer(dt)
       E.set_string_text(score_str, score)
       toReturn = true
    end
+   if not (balls_left == old_balls) then
+      old_balls = balls_left
+      E.set_string_text(balls_str, "BALL " .. balls_left)
+      toReturn = true
+   end
    if not (ball == nil) then
       local x, y, z = E.get_entity_position(ball)
       if x>55 or x<-55 or y>4 or y<0 or z>105 or z<-105 then
@@ -869,11 +901,12 @@ function do_keyboard(key, down)
    if key == E.key_right then
       flick_flipper(flipper_right_id, down)
       return true
-	end
-   if key == E.key_l then
-      E.turn_entity(camera, 0, 10, 0)
-      return true
+	--end
    elseif key == E.key_left then
+      flick_flipper(flipper_left_id, down)
+      return true
+   elseif key == E.key_down then
+      flick_flipper(flipper_right_id, down)
       flick_flipper(flipper_left_id, down)
       return true
    --elseif key == E.key_r and not down then --reset the pinball
@@ -948,10 +981,10 @@ end
 
 function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	--Compare entities and their callback and category values
-	--if ball == entityA then print(px, entityB, entityA) else print(px, entityA, entityB) 
-	--print("aCat, bCall", E.get_entity_geom_attr(entityA, E.geom_attr_category),E.get_entity_geom_attr(entityB, E.geom_attr_callback))
-	--print("bCat, aCall", E.get_entity_geom_attr(entityB, E.geom_attr_category),E.get_entity_geom_attr(entityA, E.geom_attr_callback))
-	--end
+	--[[if ball == entityA then print(px, entityB, entityA) else print(px, entityA, entityB) 
+	print("aCat, bCall", E.get_entity_geom_attr(entityA, E.geom_attr_category),E.get_entity_geom_attr(entityB, E.geom_attr_callback))
+	print("bCat, aCall", E.get_entity_geom_attr(entityB, E.geom_attr_category),E.get_entity_geom_attr(entityA, E.geom_attr_callback))
+	end]]
 
 	
    if ball == entityA or ball == entityB then
@@ -962,13 +995,12 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	 E.add_entity_force(ball, 1000*nx, 0, -1000*nz)
       end
       --Ball hit angled bumper
-      if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
-	 --print("Boing!!!")
-	 local bumpsound = E.load_sound("bin/boing.ogg")
-	 --E.set_sound_emitter(bumpsound, ball)
-	 E.play_sound(bumpsound)
-	 --E.free_sound(bumpsound)
-      end
+    if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
+		local bumpsound = E.load_sound("bin/boing.ogg")
+		--E.set_sound_emitter(bumpsound, ball)
+		E.play_sound(bumpsound)
+		--E.free_sound(bumpsound)
+    end
       for i,v in ipairs(bumpers) do
 	 --Ball hit peg
 	 if v[1] == entityB or v[1] == entityA then
@@ -1093,24 +1125,17 @@ function do_start()
     E.set_entity_joint_attr(flipper_right, plane, E.joint_attr_lo_stop, -120)
     
     -- tell user how to toggle console and exit
-    --[[E.print_console("Type F1 to toggle this console.\n")
+    E.print_console("Type F1 to toggle this console.\n")
     E.print_console("Type F2 to toggle full-screen.\n")
     E.print_console("Type escape to exit this program.\n")
     E.print_console("Type 'Left arrow' to flick the left flipper.\n")
     E.print_console("Type 'Right arrow' to flick the right flipper.\n")
-]]
+    E.print_console("Type 'Down arrow' to flick the both flippers.\n")
+
     E.enable_timer(true)
     --E.set_sound_receiver(camera, 400)
     --E.set_entity_flags(camera, E.entity_flag_wireframe, true)
     E.set_typeface("bin/Adventure_Subtitles_Normal.ttf")
-    score_str = E.create_string(score)
-    E.parent_entity(score_str, pivot)
-    --local brush_str = E.create_brush()
-    --E.set_brush_color(brush_str, 1, 0, 0, 1)
-    --E.set_string_line(score_str, brush_str)
-    --E.set_string_fill(score_str, brush_str)
-    E.set_entity_position(score_str, -47, 15, -95)
-    E.set_entity_scale(score_str, 30, 30, 30)
 
 end
 
@@ -1118,3 +1143,4 @@ do_start()
 init_table()
 --add_ball()
 begin()
+
