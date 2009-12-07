@@ -13,7 +13,7 @@ camera_z = 200--30--200--200
 camera_turn_x = -45---45---2---45
 camera_turn_y = 0--180
 camera_turn_z = 0
-camera_num = 6
+camera_num = 0
 
 -- Position of light
 light_x = 0.0
@@ -302,6 +302,11 @@ function init_table()
    add_circle_bumper(-30,30)
    add_circle_bumper(-30,-30)
    add_circle_bumper(30,-30)
+   add_circle_bumper(-38,38)
+   add_circle_bumper(-38,19)
+   add_circle_bumper(-38,0)
+   add_circle_bumper(-38,-19)
+   add_circle_bumper(-38,-38)
 
    add_circle_bumper(-38,-88)
    add_circle_bumper(-30,-80)
@@ -888,11 +893,11 @@ function do_keyboard(key, down)
 	 plunger_force = 0
 	 return true
       end
-   elseif key == E.key_c and not down then --change the camera view
+   --[[elseif key == E.key_c and not down then --change the camera view
       camera_num = camera_num + 1
       set_camera()
       return true
-   --[[elseif key == E.key_x then
+   --elseif key == E.key_x then
       light_x = light_x + 5
       E.set_entity_position(light, light_x, light_y, light_z)
       return true
@@ -950,8 +955,11 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 
 	
    if ball == entityA or ball == entityB then
-      if (wall_base == entityA or wall_base == entityB) then
+      if wall_base == entityA or wall_base == entityB then
 	 E.add_entity_force(ball, 0, 0, 500)
+      end
+      if flipper_left == entityA or flipper_left == entityB or flipper_right == entityA or flipper_right == entityB then
+	 E.add_entity_force(ball, 1000*nx, 0, -1000*nz)
       end
       --Ball hit angled bumper
       if wall_sw == entityB or wall_sw == entityA or wall_se == entityB or wall_se == entityA then
@@ -1101,14 +1109,8 @@ function do_start()
     --E.set_brush_color(brush_str, 1, 0, 0, 1)
     --E.set_string_line(score_str, brush_str)
     --E.set_string_fill(score_str, brush_str)
-    E.set_entity_position(score_str, -40, 15, -95)
+    E.set_entity_position(score_str, -47, 15, -95)
     E.set_entity_scale(score_str, 30, 30, 30)
-    --E.turn_entity(score_str, 0, 180, 0)
-    
-    local x,y,z = E.get_entity_position(score_str)
-    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(score_str)
-    print(minx, miny, minz, maxx, maxy, maxz)
-    print(x,y,z)
 
 end
 
