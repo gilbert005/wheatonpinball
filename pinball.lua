@@ -956,7 +956,7 @@ function do_contact(entityA, entityB, px, py, pz, nx, ny, nz, d)
 	
    if ball == entityA or ball == entityB then
       if wall_base == entityA or wall_base == entityB then
-	 E.add_entity_force(ball, 0, 0, 500)
+	 E.add_entity_force(ball, 0, 0, 300)
       end
       if flipper_left == entityA or flipper_left == entityB or flipper_right == entityA or flipper_right == entityB then
 	 E.add_entity_force(ball, 1000*nx, 0, -1000*nz)
