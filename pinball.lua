@@ -81,8 +81,9 @@ dots = { }
 score_str = nil
 score = 0
 bumper_score = 150
-dot_score = 50
-all_dots_score = 500
+dot_score = 250
+all_dots_score = 2500
+old_score = nil
 
 level = 1
 bumper_rgb = { { 0, 191/255, 1 }, { 124/255, 252/255, 0 }, { 1, 1, 0 }, { 1, 20/255, 147/255 } }
@@ -277,32 +278,38 @@ function init_table()
    E.set_entity_flags(finish_line, E.entity_flag_visible_geom, true)
    --E.set_entity_flags(finish_line, E.entity_flag_hidden, true)]]
    
-	--The Scoreboard
-	scoreboard_img = E.create_image("bin/pinball.jpg")
-	scoreboard_brush = E.create_brush()
-	E.set_brush_image(scoreboard_brush, scoreboard_img)
-	E.set_brush_flags(scoreboard_brush, E.brush_flag_unlit, true)
-	scoreboard = E.create_sprite(scoreboard_brush)
-	E.parent_entity(scoreboard, pivot)
-	E.set_entity_flags(scoreboard, E.entity_flag_billboard, true)
-	local score_x, score_y = E.get_image_size(scoreboard_img)
-	local table_x = table_w + wall_th
-	E.set_entity_scale(scoreboard, table_x/score_x, table_x/score_x, table_x/score_x)
-	local scale_x, scale_y, scale_z = E.get_entity_scale(scoreboard)
-	E.set_entity_position(scoreboard, 0, score_y*scale_y/2,-table_l/2-wall_th-10)
-
-
+   --The Scoreboard
+   scoreboard_img = E.create_image("bin/pinball.jpg")
+   scoreboard_brush = E.create_brush()
+   E.set_brush_image(scoreboard_brush, scoreboard_img)
+   E.set_brush_flags(scoreboard_brush, E.brush_flag_unlit, true)
+   scoreboard = E.create_sprite(scoreboard_brush)
+   E.parent_entity(scoreboard, pivot)
+   E.set_entity_flags(scoreboard, E.entity_flag_billboard, true)
+   local score_x, score_y = E.get_image_size(scoreboard_img)
+   local table_x = table_w + wall_th
+   E.set_entity_scale(scoreboard, table_x/score_x, table_x/score_x, table_x/score_x)
+   local scale_x, scale_y, scale_z = E.get_entity_scale(scoreboard)
+   E.set_entity_position(scoreboard, 0, score_y*scale_y/2,-table_l/2-wall_th-10)
+   
+   
    add_circle_bumper(0,0)
    add_circle_bumper(12,12)
    add_circle_bumper(-12,12)
    add_circle_bumper(-12,-12)
    add_circle_bumper(12,-12)
+   add_circle_bumper(30,30)
+   add_circle_bumper(-30,30)
+   add_circle_bumper(-30,-30)
+   add_circle_bumper(30,-30)
 
-   add_circle_bumper(-24,-74)
-   add_circle_bumper(-16,-66)
-   add_circle_bumper(-8,-58)
-   add_circle_bumper(0,-50)
-   add_circle_bumper(8,-42)
+   add_circle_bumper(-38,-88)
+   add_circle_bumper(-30,-80)
+   add_circle_bumper(-22,-72)
+   add_circle_bumper(-14,-64)
+   add_circle_bumper(-6,-56)
+   add_circle_bumper(2,-48)
+   add_circle_bumper(10,-40)
 --   add_circle_bumper(,0)
 
    add_dot(-24, -24)
@@ -729,8 +736,15 @@ end
 ---- Event functions
 -- timer (idle function)
 function do_timer(dt)
-	E.set_string_text(score_str, score)
    toReturn = false
+   if not (score == old_score) then
+      old_score = score
+      --local brush_str = E.create_brush()
+      --E.set_brush_color(brush_str, 0, 0, 1, 1)
+      --E.set_string_fill(score_str, brush_str)
+      E.set_string_text(score_str, score)
+      toReturn = true
+   end
    if not (ball == nil) then
       local x, y, z = E.get_entity_position(ball)
       if x>55 or x<-55 or y>4 or y<0 or z>105 or z<-105 then
@@ -1081,7 +1095,20 @@ function do_start()
     --E.set_sound_receiver(camera, 400)
     --E.set_entity_flags(camera, E.entity_flag_wireframe, true)
     E.set_typeface("bin/Adventure_Subtitles_Normal.ttf")
-	score_str = E.create_string(score)
+    score_str = E.create_string(score)
+    E.parent_entity(score_str, pivot)
+    --local brush_str = E.create_brush()
+    --E.set_brush_color(brush_str, 1, 0, 0, 1)
+    --E.set_string_line(score_str, brush_str)
+    --E.set_string_fill(score_str, brush_str)
+    E.set_entity_position(score_str, -40, 15, -95)
+    E.set_entity_scale(score_str, 30, 30, 30)
+    --E.turn_entity(score_str, 0, 180, 0)
+    
+    local x,y,z = E.get_entity_position(score_str)
+    minx, miny, minz, maxx, maxy, maxz = E.get_entity_bound(score_str)
+    print(minx, miny, minz, maxx, maxy, maxz)
+    print(x,y,z)
 
 end
 
