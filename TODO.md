@@ -1,0 +1,10 @@
+# Goals #
+
+  * Complete - Sounds - Stephen - Can be extended for addtional sounds.
+  * Scoreboard
+  * 3-ball game
+  * Plunger - Hudson
+  * Flipper - Tim
+  * 1 more action area
+  * Complete - Finish line - Stephen - Set up, but results in seemingly random segfault.  Also need to specify necessary action.
+  * Complete - change camera view with 'c' key
